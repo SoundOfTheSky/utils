@@ -1,0 +1,33 @@
+{
+  "name": "sky-utils",
+  "version": "1.0.0",
+  "description": "JavaScript/TypeScript utilities",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint \"./**/*{.js,.ts}\" --fix && tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoundOfTheSky/sky-utils.git"
+  },
+  "author": "SoundOfTheSky",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SoundOfTheSky/sky-utils/issues"
+  },
+  "homepage": "https://github.com/SoundOfTheSky/sky-utils#readme",
+  "devDependencies": {
+    "@types/bun": "^1.1.8",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.3",
+    "eslint-plugin-import": "npm:eslint-plugin-i@^2.29.1",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-sonarjs": "^1.0.4",
+    "eslint-plugin-unused-imports": "^3.2.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  }
+}
