@@ -6,6 +6,11 @@ export function getPropertyNames(e: object) {
   return keys;
 }
 
+/** Map function like for arrays, but for objects */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const objectMap = <T>(object: object, fn: (key: string, val: T) => [string, any]) =>
   Object.fromEntries(Object.entries(object).map(([key, val]) => fn(key, val as T)));
+
+/** Filter function like for arrays, but for objects */
+export const objectFilter = <T>(object: object, fn: (key: string, val: T) => unknown) =>
+  Object.fromEntries(Object.entries(object).filter(([key, val]) => fn(key, val as T)));

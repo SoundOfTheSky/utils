@@ -10,7 +10,8 @@ export class ValidationError extends Error {
 const defaultPriorityErrorKeys = ['message', 'messages', 'msg', 'msgs', 'text', 'txt', 'error', 'errors', 'err', 'e'];
 
 /**
- * Find error inside an object recursively.
+ * Find error inside anything recursively.
+ * Good for finding human-readable errors.
  * Tries priority keys first.
  * Parses JSON automatically.
  * Returns undefind if nothing found.

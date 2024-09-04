@@ -1,13 +1,14 @@
 import { HOUR_MS } from './consts';
 import { ValidationError } from './errors';
 
+/** Like setInterval but with cron. Returns clear function. */
 export function cronInterval(fn: () => unknown, cronString: string) {
   let timeout: Timer;
-  let next = getNextCron(cronString);
+  let next = getNextCron(cronString).getTime();
   const r = () => {
-    const d = Date.now() - next.getTime();
+    const d = Date.now() - next;
     if (d < 1) {
-      next = getNextCron(cronString);
+      next = getNextCron(cronString).getTime();
       fn();
     }
     timeout = setTimeout(r, d < HOUR_MS ? d : HOUR_MS);
@@ -63,7 +64,7 @@ export function getNextCron(cronString: string, datetime = new Date()) {
 }
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export function parseCronItem(cronString: string, min: number, max: number): number[] {
+function parseCronItem(cronString: string, min: number, max: number): number[] {
   const cron = cronString.split(',');
   const ok = new Set<number>();
   const err = new ValidationError(`Can\'t parse CRON string: ${cronString}`);
