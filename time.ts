@@ -3,7 +3,7 @@ import { ValidationError } from './errors';
 
 /** Like setInterval but with cron. Returns clear function. */
 export function cronInterval(fn: () => unknown, cronString: string) {
-  let timeout: Timer;
+  let timeout: number;
   let next = getNextCron(cronString).getTime();
   const r = () => {
     const d = Date.now() - next;
@@ -11,7 +11,7 @@ export function cronInterval(fn: () => unknown, cronString: string) {
       next = getNextCron(cronString).getTime();
       fn();
     }
-    timeout = setTimeout(r, d < HOUR_MS ? d : HOUR_MS);
+    timeout = setTimeout(r, d < HOUR_MS ? d : HOUR_MS) as unknown as number;
   };
   r();
   return () => clearTimeout(timeout);
