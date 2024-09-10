@@ -1,6 +1,7 @@
-/** Get unique id. Use like this: uuid++ */
-// eslint-disable-next-line prefer-const
-export let uuid = 1;
+let _uuid = Date.now() * 1000;
+/** Get unique id */
+export const UUID = () => _uuid++;
+
 /**
  * Creates cached function. All arguments/results are cached.
  * Returns [
