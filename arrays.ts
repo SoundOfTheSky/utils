@@ -1,8 +1,14 @@
+/** Returns random element from non-empty array */
+export function randomFromArray<T>(arr: T[]): T {
+  if (arr.length === 0) throw new Error('Can not return random element from empty array');
+  return arr[~~(Math.random() * arr.length)];
+}
+
 /** Create new shuffled array */
 export function shuffleArray<T>(arr: T[]): T[] {
   const array = [...arr];
   for (let i = 0; i < array.length; i++) {
-    const i2 = Math.floor(Math.random() * array.length);
+    const i2 = ~~(Math.random() * array.length);
     const buf = array[i2];
     array[i2] = array[i]!;
     array[i] = buf;

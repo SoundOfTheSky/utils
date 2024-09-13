@@ -12,7 +12,7 @@ export function formatTime(time: number, min = 1) {
   for (const [ms, title] of ranges) {
     if (min && time < min) break;
     if (time < ms) continue;
-    const val = Math.floor(time / ms);
+    const val = ~~(time / ms);
     if (val !== 0) output += ` ${val}${title}`;
     time %= ms;
   }
@@ -29,7 +29,7 @@ export const snakeToCamelCase = (str: string) => str.replaceAll(/_[a-z]/g, (lett
 export function formatBytes(bytes: number) {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   if (!bytes) return `0B`;
-  const pow = Math.floor(Math.log(bytes) / Math.log(1024));
+  const pow = ~~(Math.log(bytes) / Math.log(1024));
   const maxPow = Math.min(pow, sizes.length - 1);
   return `${Number.parseFloat((bytes / Math.pow(1024, maxPow)).toFixed(2))}${sizes[maxPow]}`;
 }
