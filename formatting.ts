@@ -19,10 +19,10 @@ export function formatTime(time: number, min = 1) {
   return output;
 }
 
-/** thisCase to this-case */
+/** thisCase to this_case */
 export const camelToSnakeCase = (str: string) => str.replaceAll(/[A-Z]+/g, (letter) => `_${letter.toLowerCase()}`);
 
-/** this-case to thisCase */
+/** this_case to thisCase */
 export const snakeToCamelCase = (str: string) => str.replaceAll(/_[a-z]/g, (letter) => letter[1].toUpperCase());
 
 /** Bytes to KB,MB,GB,TB */
