@@ -1,3 +1,5 @@
+import { ObjectAddPrefix } from './types';
+
 /** Get all prorerty names, including in prototype */
 export function getPropertyNames(e: object) {
   const keys = Object.getOwnPropertyNames(e);
@@ -14,3 +16,13 @@ export const objectMap = <T>(object: object, fn: (key: string, val: T) => [strin
 /** Filter function like for arrays, but for objects */
 export const objectFilter = <T>(object: object, fn: (key: string, val: T) => unknown) =>
   Object.fromEntries(Object.entries(object).filter(([key, val]) => fn(key, val as T)));
+
+/** Adds prefix to every key in object */
+export function addPrefixToObject<T extends Record<string, unknown>, P extends string>(
+  obj: Record<string, T>,
+  prefix: P,
+): ObjectAddPrefix<T, P> {
+  const n: Record<string, unknown> = {};
+  for (const key in obj) n[prefix + key] = obj[key];
+  return n as ObjectAddPrefix<T, P>;
+}
