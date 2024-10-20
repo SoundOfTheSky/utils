@@ -1,3 +1,5 @@
+import { JSONSerializable } from './types';
+
 let _uuid = Date.now() * 1000;
 /** Get unique id */
 export const UUID = () => _uuid++;
@@ -10,7 +12,7 @@ export const UUID = () => _uuid++;
  *  hash
  * ]
  */
-export function createCashedFunction<T, V extends unknown[]>(fn: (...args: V) => T) {
+export function createCashedFunction<T, V extends JSONSerializable[]>(fn: (...args: V) => T) {
   const hash = new Map<string, T>();
   return [
     (...args: V) => {
@@ -34,7 +36,7 @@ export function createCashedFunction<T, V extends unknown[]>(fn: (...args: V) =>
  *  hash
  * ]
  */
-export function createCashedAsyncFunction<T, V extends unknown[]>(fn: (...args: V) => Promise<T>) {
+export function createCashedAsyncFunction<T, V extends JSONSerializable[]>(fn: (...args: V) => Promise<T>) {
   const hash = new Map<string, T>();
   return [
     async (...args: V) => {
@@ -51,7 +53,7 @@ export function createCashedAsyncFunction<T, V extends unknown[]>(fn: (...args: 
 }
 
 /** Retry async function */
-export async function retry<T>(fn: () => Promise<T>, retries: number, interval: number | number[] = 0): Promise<T> {
+export async function retry<T>(fn: () => Promise<T>, retries = 5, interval: number | number[] = 0): Promise<T> {
   try {
     return await fn();
   } catch (error) {
@@ -59,6 +61,42 @@ export async function retry<T>(fn: () => Promise<T>, retries: number, interval: 
     await wait(typeof interval === 'number' ? interval : interval[interval.length - retries]);
     return retry(fn, retries - 1, interval);
   }
+}
+
+/** Create debounced function. Basically adds cooldown to function. Warning: throws! */
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function createDebouncedFunction<T, V extends unknown[]>(
+  fn: (...args: V) => T,
+  time: number,
+): (...args: V) => T {
+  let nextExec = 0;
+  return (...args: V) => {
+    const now = Date.now();
+    if (nextExec > now) throw new Error('Debounced');
+    nextExec = now + time;
+    return fn(...args);
+  };
+}
+
+/** Create throttled function. Basically limits function calls in time period. Warning: throws! */
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function createThrottledFunction<T, V extends unknown[]>(
+  fn: (...args: V) => T,
+  calls: number,
+  time: number,
+): (...args: V) => T {
+  let nextClear = 0;
+  let amount = 0;
+  return (...args: V) => {
+    const now = Date.now();
+    if (nextClear <= now) {
+      nextClear = now + time;
+      amount = 0;
+    }
+    if (amount === calls) throw new Error('Throttled');
+    amount++;
+    return fn(...args);
+  };
 }
 
 /** setTimeout promisify */

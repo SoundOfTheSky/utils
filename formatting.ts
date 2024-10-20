@@ -1,13 +1,16 @@
 /** Milliseconds to human readable time. Minimum accuracy, if set to 1000 will stop at seconds  */
-export function formatTime(time: number, min = 1) {
-  const ranges = [
+export function formatTime(
+  time: number,
+  min = 0,
+  ranges: [number, string][] = [
     [31_536_000_000, 'y'],
     [86_400_000, 'd'],
     [3_600_000, 'h'],
     [60_000, 'm'],
     [1000, 's'],
     [1, 'ms'],
-  ] as const;
+  ],
+) {
   let output = '';
   for (const [ms, title] of ranges) {
     if (min && time < min) break;
@@ -28,7 +31,7 @@ export const snakeToCamelCase = (str: string) => str.replaceAll(/_[a-z]/g, (lett
 /** Bytes to KB,MB,GB,TB */
 export function formatBytes(bytes: number) {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  if (!bytes) return `0B`;
+  if (bytes === 0) return `0B`;
   const pow = ~~(Math.log(bytes) / Math.log(1024));
   const maxPow = Math.min(pow, sizes.length - 1);
   return `${Number.parseFloat((bytes / Math.pow(1024, maxPow)).toFixed(2))}${sizes[maxPow]}`;

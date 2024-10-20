@@ -46,3 +46,11 @@ export function binarySearch(size: number, compare: (index: number) => number) {
   }
   return position;
 }
+
+/** Split array into sub arrays of spicified size */
+export function chunk<T>(arr: T[], chunkSize: number): T[][] {
+  const copy = [...arr];
+  const result: T[][] = [];
+  while (copy.length) result.push(copy.splice(0, chunkSize));
+  return result;
+}
