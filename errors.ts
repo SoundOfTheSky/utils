@@ -51,7 +51,7 @@ function findErrorTextInObject(
   priorityErrorKeys = defaultPriorityErrorKeys,
   stack = new Set(),
 ): string | undefined {
-  const keys = (getPropertyNames(e) as (keyof typeof e)[])
+  const keys = ([...getPropertyNames(e)] as (keyof typeof e)[])
     .map((key) => {
       let score = priorityErrorKeys.indexOf(key);
       if (score === -1) {
