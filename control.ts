@@ -99,6 +99,42 @@ export function createThrottledFunction<T, V extends unknown[]>(
   };
 }
 
+/** Create debounced function. Basically create function that will be called with delay,
+ * but if another call comes in, we reset the timer. */
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function createDelayedFunction<T, V extends unknown[]>(
+  fn: (...args: V) => T,
+  time: number,
+): (...args: V) => Promise<T> {
+  let timeout: ReturnType<typeof setTimeout>;
+  let activePromise: ImmediatePromise<T> | undefined;
+  return (...args: V) => {
+    activePromise ??= new ImmediatePromise();
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      activePromise?.resolve(fn(...args));
+      activePromise = undefined;
+    }, time);
+    return activePromise;
+  };
+}
+
+/** Promise that accepts no callback, but exposes `resolve` and `reject` methods */
+export class ImmediatePromise<T> extends Promise<T> {
+  public resolve!: (value: T | PromiseLike<T>) => void;
+  public reject!: (reason?: unknown) => void;
+
+  public constructor() {
+    let resolve: (value: T | PromiseLike<T>) => void = noop;
+    let reject: (reason?: unknown) => void = noop;
+    super((r, j) => {
+      resolve = r;
+      reject = j;
+    });
+    this.resolve = resolve;
+    this.reject = reject;
+  }
+}
 /** setTimeout promisify */
 export const wait = (time: number) => new Promise((r) => setTimeout(r, time));
 
