@@ -1,3 +1,7 @@
+/**
+ * Timers, CRON, etc.
+ */
+
 import { HOUR_MS } from './consts';
 import { ValidationError } from './errors';
 

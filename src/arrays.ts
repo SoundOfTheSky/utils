@@ -1,3 +1,7 @@
+/**
+ * Everything array related.
+ */
+
 /** Returns random element from non-empty array */
 export function randomFromArray<T>(arr: T[]): T {
   if (arr.length === 0) throw new Error('Can not return random element from empty array');

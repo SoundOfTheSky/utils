@@ -1,3 +1,7 @@
+/**
+ * Anything related to formatting and logging.
+ */
+
 /** Milliseconds to human readable time. Minimum accuracy, if set to 1000 will stop at seconds  */
 export function formatTime(
   time: number,

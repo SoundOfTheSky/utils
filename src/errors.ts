@@ -1,3 +1,7 @@
+/**
+ * Custom errors, finding errors and error handling.
+ */
+
 import { getPropertyNames } from './objects';
 
 /**

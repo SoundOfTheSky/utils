@@ -1,4 +1,9 @@
+/**
+ * Damn, I **love** TypeScript.
+ */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 /** Make keys in object optional */
 export type Optional<T, K extends keyof any> = Omit<T, K & keyof T> & Partial<Pick<T, K & keyof T>>;
 

@@ -1,3 +1,6 @@
+/**
+ * Numbers, math, etc.
+ */
 import { ValidationError } from './errors';
 
 /** Random number between min and max. May enable float */

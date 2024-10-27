@@ -4,7 +4,8 @@
   "description": "JavaScript/TypeScript utilities",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint \"./**/*{.js,.ts}\" --fix && tsc"
+    "lint": "eslint \"./**/*{.js,.ts}\" --fix && tsc",
+    "gen-readme": "bun ./generate-readme.ts"
   },
   "repository": {
     "type": "git",

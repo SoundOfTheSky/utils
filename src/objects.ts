@@ -1,3 +1,7 @@
+/**
+ * [object Object]
+ */
+
 import { ObjectAddPrefix } from './types';
 
 /** Get all prorerty names, including in prototype */

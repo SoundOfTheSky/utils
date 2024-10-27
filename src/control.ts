@@ -1,3 +1,7 @@
+/**
+ * Utils related to code execution flow.
+ */
+
 import { JSONSerializable } from './types';
 
 let _uuid = Date.now() * 1000;
@@ -135,6 +139,7 @@ export class ImmediatePromise<T> extends Promise<T> {
     this.reject = reject;
   }
 }
+
 /** setTimeout promisify */
 export const wait = (time: number) => new Promise((r) => setTimeout(r, time));
 
