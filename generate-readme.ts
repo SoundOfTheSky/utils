@@ -7,7 +7,8 @@ Basically library, but it's too simple to be on npm.`;
 
 const files = readFileSync('./index.ts', 'utf8')
   .split('\n')
-  .map((x) => x.slice(16, -2)).slice(0,-1);
+  .map((x) => x.slice(16, -2))
+  .slice(0, -1);
 
 function extractCommentText(text: string) {
   return text
@@ -15,7 +16,8 @@ function extractCommentText(text: string) {
     .map((x) => x.trim())
     .map((x) => (x[0] === '*' ? x.slice(1) : x))
     .map((x) => x.trim())
-    .join('\n').trim();
+    .join('\n')
+    .trim();
 }
 for (const file of files) {
   const content = readFileSync(`.${file}.ts`, 'utf8');
