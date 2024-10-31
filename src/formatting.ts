@@ -27,10 +27,12 @@ export function formatTime(
 }
 
 /** thisCase to this_case */
-export const camelToSnakeCase = (str: string) => str.replaceAll(/[A-Z]+/g, (letter) => `_${letter.toLowerCase()}`);
+export const camelToSnakeCase = (str: string) =>
+  str.replaceAll(/[A-Z]+/g, (letter) => `_${letter.toLowerCase()}`);
 
 /** this_case to thisCase */
-export const snakeToCamelCase = (str: string) => str.replaceAll(/_[a-z]/g, (letter) => letter[1].toUpperCase());
+export const snakeToCamelCase = (str: string) =>
+  str.replaceAll(/_[a-z]/g, (letter) => letter[1]!.toUpperCase());
 
 /** Bytes to KB,MB,GB,TB */
 export function formatBytes(bytes: number) {
@@ -47,7 +49,9 @@ export function log(...agrs: unknown[]) {
 }
 
 /** Can pass streams through to log a progress */
-export class ProgressLoggerTransform<T extends { length: number }> extends TransformStream<T> {
+export class ProgressLoggerTransform<
+  T extends { length: number },
+> extends TransformStream<T> {
   public constructor(str: string, logInterval: number, maxSize?: number) {
     let bytes = 0;
     const start = Date.now();

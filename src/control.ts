@@ -16,7 +16,9 @@ export const UUID = () => _uuid++;
  *  hash
  * ]
  */
-export function createCashedFunction<T, V extends JSONSerializable[]>(fn: (...args: V) => T) {
+export function createCashedFunction<T, V extends JSONSerializable[]>(
+  fn: (...args: V) => T,
+) {
   const hash = new Map<string, T>();
   return [
     (...args: V) => {
@@ -40,7 +42,9 @@ export function createCashedFunction<T, V extends JSONSerializable[]>(fn: (...ar
  *  hash
  * ]
  */
-export function createCashedAsyncFunction<T, V extends JSONSerializable[]>(fn: (...args: V) => Promise<T>) {
+export function createCashedAsyncFunction<T, V extends JSONSerializable[]>(
+  fn: (...args: V) => Promise<T>,
+) {
   const hash = new Map<string, T>();
   return [
     async (...args: V) => {
@@ -57,18 +61,25 @@ export function createCashedAsyncFunction<T, V extends JSONSerializable[]>(fn: (
 }
 
 /** Retry async function */
-export async function retry<T>(fn: () => Promise<T>, retries = 5, interval: number | number[] = 0): Promise<T> {
+export async function retry<T>(
+  fn: () => Promise<T>,
+  retries = 5,
+  interval: number | number[] = 0,
+): Promise<T> {
   try {
     return await fn();
   } catch (error) {
     if (retries === 0) throw error;
-    await wait(typeof interval === 'number' ? interval : interval[interval.length - retries]);
+    await wait(
+      typeof interval === 'number'
+        ? interval
+        : interval[interval.length - retries]!,
+    );
     return retry(fn, retries - 1, interval);
   }
 }
 
 /** Create debounced function. Basically adds cooldown to function. Warning: throws! */
-// eslint-disable-next-line @typescript-eslint/ban-types
 export function createDebouncedFunction<T, V extends unknown[]>(
   fn: (...args: V) => T,
   time: number,
@@ -83,7 +94,6 @@ export function createDebouncedFunction<T, V extends unknown[]>(
 }
 
 /** Create throttled function. Basically limits function calls in time period. Warning: throws! */
-// eslint-disable-next-line @typescript-eslint/ban-types
 export function createThrottledFunction<T, V extends unknown[]>(
   fn: (...args: V) => T,
   calls: number,
@@ -105,7 +115,6 @@ export function createThrottledFunction<T, V extends unknown[]>(
 
 /** Create debounced function. Basically create function that will be called with delay,
  * but if another call comes in, we reset the timer. */
-// eslint-disable-next-line @typescript-eslint/ban-types
 export function createDelayedFunction<T, V extends unknown[]>(
   fn: (...args: V) => T,
   time: number,
@@ -144,4 +153,5 @@ export class ImmediatePromise<T> extends Promise<T> {
 export const wait = (time: number) => new Promise((r) => setTimeout(r, time));
 
 /** Empty function that does nothing */
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export const noop = () => {};

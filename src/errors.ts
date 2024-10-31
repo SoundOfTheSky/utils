@@ -11,7 +11,18 @@ export class ValidationError extends Error {
   public override name = 'ValidationError';
 }
 
-const defaultPriorityErrorKeys = ['message', 'messages', 'msg', 'msgs', 'text', 'txt', 'error', 'errors', 'err', 'e'];
+const defaultPriorityErrorKeys = [
+  'message',
+  'messages',
+  'msg',
+  'msgs',
+  'text',
+  'txt',
+  'error',
+  'errors',
+  'err',
+  'e',
+];
 
 /**
  * Find error inside anything recursively.
@@ -28,10 +39,15 @@ export function findErrorText(
   if (!e || stack.has(e)) return;
   stack.add(e);
   if (stack.size > 1000) throw new Error('Stack overflow');
-  if (typeof e === 'string') return findErrorTextInString(e, priorityErrorKeys, stack);
+  if (typeof e === 'string')
+    return findErrorTextInString(e, priorityErrorKeys, stack);
   if (typeof e === 'object') {
     if (Symbol.iterator in e && !Array.isArray(e))
-      return findErrorTextInObject({ obj: e, iteratorResult: [...(e as Iterable<unknown>)] }, priorityErrorKeys, stack);
+      return findErrorTextInObject(
+        { obj: e, iteratorResult: [...(e as Iterable<unknown>)] },
+        priorityErrorKeys,
+        stack,
+      );
     return findErrorTextInObject(e, priorityErrorKeys, stack);
   }
 }

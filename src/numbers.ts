@@ -10,15 +10,21 @@ export function random(min: number, max: number, float?: boolean): number {
 }
 
 /** Same as parseInt but throws */
-export function parseInt(param: string, radix?: number) {
-  const n = Number.parseInt(param, radix);
-  if (Number.isNaN(n) || !Number.isSafeInteger(n)) throw new ValidationError(`Can not parse "${param}" to integer`);
+export function parseInt(param: unknown, radix?: number) {
+  const n = Number.parseInt(param as string, radix);
+
+  if (Number.isNaN(n) || !Number.isSafeInteger(n))
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    throw new ValidationError(`Can not parse "${param}" to integer`);
   return n;
 }
 
 /** Same as parseFloat but throws */
-export function parseFloat(param: string) {
-  const n = Number.parseFloat(param);
-  if (Number.isNaN(n) || !Number.isFinite(n)) throw new ValidationError(`Can not parse "${param}" to float`);
+export function parseFloat(param: unknown) {
+  const n = Number.parseFloat(param as string);
+
+  if (Number.isNaN(n) || !Number.isFinite(n))
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    throw new ValidationError(`Can not parse "${param}" to float`);
   return n;
 }

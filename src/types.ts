@@ -5,7 +5,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /** Make keys in object optional */
-export type Optional<T, K extends keyof any> = Omit<T, K & keyof T> & Partial<Pick<T, K & keyof T>>;
+export type Optional<T, K extends keyof any> = Omit<T, K & keyof T> &
+  Partial<Pick<T, K & keyof T>>;
 
 /** Anything that can be serialized to JSON */
 export type JSONSerializable =
@@ -23,11 +24,12 @@ export type ObjectAddPrefix<T, P extends string> = {
 };
 
 /** Convert type of thisCase to this_case */
-export type CamelToSnakeCase<S extends string> = S extends `${infer T}${infer U}`
-  ? U extends Uncapitalize<U>
-    ? `${Lowercase<T>}${CamelToSnakeCase<U>}`
-    : `${Lowercase<T>}_${CamelToSnakeCase<Uncapitalize<U>>}`
-  : S;
+export type CamelToSnakeCase<S extends string> =
+  S extends `${infer T}${infer U}`
+    ? U extends Uncapitalize<U>
+      ? `${Lowercase<T>}${CamelToSnakeCase<U>}`
+      : `${Lowercase<T>}_${CamelToSnakeCase<Uncapitalize<U>>}`
+    : S;
 
 /** Convert object keys of thisCase to this_case */
 export type ObjectCamelToSnakeCase<T> = {
@@ -45,4 +47,8 @@ export type ObjectSnakeToCamel<T> = {
 };
 
 /** Concat types of array or objects */
-export type Concat<T, U> = T extends any[] ? (U extends any[] ? [...T, ...U] : never) : T & U;
+export type Concat<T, U> = T extends any[]
+  ? U extends any[]
+    ? [...T, ...U]
+    : never
+  : T & U;
