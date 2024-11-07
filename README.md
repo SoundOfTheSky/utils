@@ -27,7 +27,7 @@ Some useful consts. That's it.
 Utils related to code execution flow.
 ### const UUID
 Get unique id
-### async function
+### async function retry
 Retry async function
 ### function createDebouncedFunction
 Create debounced function. Basically adds cooldown to function. Warning: throws!
@@ -117,6 +117,8 @@ Find next cron tick after passed date
 Damn, I **love** TypeScript.
 ### type Optional
 Make keys in object optional
+### type AwaitedObject
+Recursively resolves promises in objects and arrays
 ### type JSONSerializable
 Anything that can be serialized to JSON
 ### type ObjectAddPrefix

@@ -2,7 +2,7 @@
  * Utils related to code execution flow.
  */
 
-import { JSONSerializable } from './types';
+import { AwaitedObject, JSONSerializable } from './types';
 
 let _uuid = Date.now() * 1000;
 /** Get unique id */
@@ -147,6 +147,28 @@ export class ImmediatePromise<T> extends Promise<T> {
     this.resolve = resolve;
     this.reject = reject;
   }
+}
+
+/** Recursively resolves promises in objects and arrays */
+export default async function deepPromiseAll<T>(
+  input: T,
+): Promise<AwaitedObject<T>> {
+  if (input instanceof Promise) return deepPromiseAll(await input);
+  if (Array.isArray(input))
+    return Promise.all(
+      input.map((item) => deepPromiseAll(item)),
+    ) as AwaitedObject<T>;
+  if (typeof input === 'object' && input !== null) {
+    return Object.fromEntries(
+      await Promise.all(
+        Object.entries(input).map(async ([key, value]) => [
+          key,
+          await deepPromiseAll(value),
+        ]),
+      ),
+    ) as AwaitedObject<T>;
+  }
+  return input as AwaitedObject<T>;
 }
 
 /** setTimeout promisify */

@@ -23,7 +23,7 @@ for (const file of files) {
   const content = readFileSync(`.${file}.ts`, 'utf8');
   readme += `\n\n## ${file.slice(5)}\n${extractCommentText(/\/\*\*([^/]+?)\*\//s.exec(content)![1]!)}`;
   for (const match of content.matchAll(
-    /\/\*\*([^/]+?)\*\/\n(\/\/[^\n]+?\n)*export (\w+ \w+)/gs,
+    /\/\*\*([^/]+?)\*\/\n(\/\/[^\n]+?\n)*export ((const|function|async function|function*|type|class) \w+)/gs,
   ))
     readme += `\n### ${match[3]}\n${extractCommentText(match[1]!)}`;
 }

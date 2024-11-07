@@ -8,6 +8,15 @@
 export type Optional<T, K extends keyof any> = Omit<T, K & keyof T> &
   Partial<Pick<T, K & keyof T>>;
 
+/** Recursively resolves promises in objects and arrays */
+export type AwaitedObject<T> = {
+  [K in keyof T]: T[K] extends Promise<infer U>
+    ? U
+    : T[K] extends object
+      ? AwaitedObject<T[K]>
+      : T[K];
+};
+
 /** Anything that can be serialized to JSON */
 export type JSONSerializable =
   | string
