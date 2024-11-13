@@ -5,9 +5,9 @@ let readme = `# Sky utils
 
 Basically library, but it's too simple to be on npm.`;
 
-const files = readFileSync('./index.ts', 'utf8')
+const files = readFileSync('./src/index.ts', 'utf8')
   .split('\n')
-  .map((x) => x.slice(16, -2))
+  .map((x) => x.slice(16, -1))
   .slice(0, -1);
 
 function extractCommentText(text: string) {
@@ -20,8 +20,8 @@ function extractCommentText(text: string) {
     .trim();
 }
 for (const file of files) {
-  const content = readFileSync(`.${file}.ts`, 'utf8');
-  readme += `\n\n## ${file.slice(5)}\n${extractCommentText(/\/\*\*([^/]+?)\*\//s.exec(content)![1]!)}`;
+  const content = readFileSync(`./src${file}.ts`, 'utf8');
+  readme += `\n\n## ${file.slice(1)}\n${extractCommentText(/\/\*\*([^/]+?)\*\//s.exec(content)![1]!)}`;
   for (const match of content.matchAll(
     /\/\*\*([^/]+?)\*\/\n(\/\/[^\n]+?\n)*export ((const|function|async function|function*|type|class) \w+)/gs,
   ))

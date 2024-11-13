@@ -3,30 +3,30 @@
  */
 
 /** Returns random element from non-empty array */
-export function randomFromArray<T>(arr: T[]): T {
-  if (arr.length === 0)
-    throw new Error('Can not return random element from empty array');
-  return arr[~~(Math.random() * arr.length)]!;
+export function randomFromArray<T>(array: T[]): T {
+  if (array.length === 0)
+    throw new Error('Can not return random element from empty array')
+  return array[Math.trunc(Math.random() * array.length)]!
 }
 
 /** Create new shuffled array */
-export function shuffleArray<T>(arr: T[]): T[] {
-  const array = [...arr];
-  for (let i = 0; i < array.length; i++) {
-    const i2 = ~~(Math.random() * array.length);
-    const buf = array[i2]!;
-    array[i2] = array[i]!;
-    array[i] = buf;
+export function shuffleArray<T>(array_: T[]): T[] {
+  const array = [...array_]
+  for (let index = 0; index < array.length; index++) {
+    const index2 = Math.trunc(Math.random() * array.length)
+    const buf = array[index2]!
+    array[index2] = array[index]!
+    array[index] = buf
   }
-  return array;
+  return array
 }
 
 /** Swap two elements in array */
-export function swap<T>(arr: T[], i: number, i2: number) {
-  const temp = arr[i2]!;
-  arr[i2] = arr[i]!;
-  arr[i] = temp;
-  return arr;
+export function swap<T>(array: T[], index: number, index2: number) {
+  const temporary = array[index2]!
+  array[index2] = array[index]!
+  array[index] = temporary
+  return array
 }
 
 /**
@@ -37,25 +37,26 @@ export function swap<T>(arr: T[], i: number, i2: number) {
  * If compare returns < 0 it means we have to cut out smaller side of array.
  */
 export function binarySearch(size: number, compare: (index: number) => number) {
-  let low = 0;
-  let high = size - 1;
-  let position = -1;
+  let low = 0
+  let high = size - 1
+  let position = -1
   while (low <= high) {
-    const mid = ~~((low + high) / 2);
-    const compared = compare(mid);
+    const mid = Math.trunc((low + high) / 2)
+    const compared = compare(mid)
     if (compared === 0) {
-      position = mid;
-      break;
-    } else if (compared > 0) high = mid - 1;
-    else low = mid + 1;
+      position = mid
+      break
+    }
+    else if (compared > 0) high = mid - 1
+    else low = mid + 1
   }
-  return position;
+  return position
 }
 
 /** Split array into sub arrays of spicified size */
-export function chunk<T>(arr: T[], chunkSize: number): T[][] {
-  const copy = [...arr];
-  const result: T[][] = [];
-  while (copy.length) result.push(copy.splice(0, chunkSize));
-  return result;
+export function chunk<T>(array: T[], chunkSize: number): T[][] {
+  const copy = [...array]
+  const result: T[][] = []
+  while (copy.length > 0) result.push(copy.splice(0, chunkSize))
+  return result
 }

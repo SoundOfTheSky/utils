@@ -1,24 +1,25 @@
 {
-  "name": "sky-utils",
+  "name": "@softsky/utils",
   "version": "1.0.0",
   "description": "JavaScript/TypeScript utilities",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "lint": "eslint \"./**/*{.js,.ts}\" --fix && tsc",
+    "lint": "eslint \"./src/**/*.ts\" --fix && tsc",
     "gen-readme": "bun ./generate-readme.ts"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SoundOfTheSky/sky-utils.git"
+    "url": "git+https://github.com/SoundOfTheSky/utils.git"
   },
   "author": "SoundOfTheSky",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/SoundOfTheSky/sky-utils/issues"
+    "url": "https://github.com/SoundOfTheSky/utils/issues"
   },
-  "homepage": "https://github.com/SoundOfTheSky/sky-utils#readme",
+  "homepage": "https://github.com/SoundOfTheSky/utils#readme",
   "devDependencies": {
-    "@types/bun": "^1.1.12",
-    "sky-lint": "file:../sky-lint"
-  }
+    "@softsky/configs": "^1.0.4",
+    "@types/bun": "^1.1.12"
+  },
+  "files": ["dist/**/*"]
 }

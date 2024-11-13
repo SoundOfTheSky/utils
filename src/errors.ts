@@ -2,13 +2,13 @@
  * Custom errors, finding errors and error handling.
  */
 
-import { getPropertyNames } from './objects';
+import { getPropertyNames } from './objects'
 
 /**
  *  Use as intended error. Basically 4** errors in HTTP
  */
 export class ValidationError extends Error {
-  public override name = 'ValidationError';
+  public override name = 'ValidationError'
 }
 
 const defaultPriorityErrorKeys = [
@@ -22,7 +22,7 @@ const defaultPriorityErrorKeys = [
   'errors',
   'err',
   'e',
-];
+]
 
 /**
  * Find error inside anything recursively.
@@ -32,59 +32,64 @@ const defaultPriorityErrorKeys = [
  * Returns undefind if nothing found.
  */
 export function findErrorText(
-  e: unknown,
+  error: unknown,
   priorityErrorKeys = defaultPriorityErrorKeys,
   stack = new Set(),
 ): string | undefined {
-  if (!e || stack.has(e)) return;
-  stack.add(e);
-  if (stack.size > 1000) throw new Error('Stack overflow');
-  if (typeof e === 'string')
-    return findErrorTextInString(e, priorityErrorKeys, stack);
-  if (typeof e === 'object') {
-    if (Symbol.iterator in e && !Array.isArray(e))
+  if (!error || stack.has(error)) return
+  stack.add(error)
+  if (stack.size > 1000) throw new Error('Stack overflow')
+  if (typeof error === 'string')
+    return findErrorTextInString(error, priorityErrorKeys, stack)
+  if (typeof error === 'object') {
+    if (Symbol.iterator in error && !Array.isArray(error))
       return findErrorTextInObject(
-        { obj: e, iteratorResult: [...(e as Iterable<unknown>)] },
+        { obj: error, iteratorResult: [...(error as Iterable<unknown>)] },
         priorityErrorKeys,
         stack,
-      );
-    return findErrorTextInObject(e, priorityErrorKeys, stack);
+      )
+    return findErrorTextInObject(error, priorityErrorKeys, stack)
   }
 }
 
 /** Find string that looks like a human-readable error using some simple heuristics */
 function findErrorTextInString(
-  e: string,
+  error: string,
   priorityErrorKeys = defaultPriorityErrorKeys,
   stack = new Set(),
 ): string | undefined {
   try {
-    return findErrorText(JSON.parse(e), priorityErrorKeys, stack);
-  } catch {
-    if (e.length < 4 || e === '[object Object]') return;
-    return e;
+    return findErrorText(JSON.parse(error), priorityErrorKeys, stack)
+  }
+  catch {
+    if (error.length < 4 || error === '[object Object]') return
+    return error
   }
 }
 
 function findErrorTextInObject(
-  e: object,
+  error: object,
   priorityErrorKeys = defaultPriorityErrorKeys,
   stack = new Set(),
 ): string | undefined {
-  const keys = ([...getPropertyNames(e)] as (keyof typeof e)[])
+  const keys = ([...getPropertyNames(error)] as (keyof typeof error)[])
     .map((key) => {
-      let score = priorityErrorKeys.indexOf(key);
+      let score = priorityErrorKeys.indexOf(key)
       if (score === -1) {
-        if (!Number.isNaN(key)) score = priorityErrorKeys.length;
-        else if (typeof e[key] !== 'function') score = Number.MAX_SAFE_INTEGER;
-        else score = Number.MAX_SAFE_INTEGER - 1;
+        if (!Number.isNaN(key)) score = priorityErrorKeys.length
+        else if (typeof error[key] === 'function') {
+          score = Number.MAX_SAFE_INTEGER - 1
+        }
+        else {
+          score = Number.MAX_SAFE_INTEGER
+        }
       }
-      return [key, score] as const;
+      return [key, score] as const
     })
-    .sort(([_, v], [_k, v2]) => v - v2)
-    .map(([k]) => k);
+    .sort(([, v], [, v2]) => v - v2)
+    .map(([k]) => k)
   for (const key of keys) {
-    const result = findErrorText(e[key], priorityErrorKeys, stack);
-    if (result) return result;
+    const result = findErrorText(error[key], priorityErrorKeys, stack)
+    if (result) return result
   }
 }
