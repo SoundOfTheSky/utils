@@ -1,11 +1,12 @@
 {
   "name": "@softsky/utils",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "JavaScript/TypeScript utilities",
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint \"./src/**/*.ts\" --fix && tsc",
-    "gen-readme": "bun ./generate-readme.ts"
+    "gen-readme": "bun ./generate-readme.ts",
+    "prepare": "bun run lint && bun run gen-readme"
   },
   "repository": {
     "type": "git",
@@ -18,8 +19,8 @@
   },
   "homepage": "https://github.com/SoundOfTheSky/utils#readme",
   "devDependencies": {
-    "@softsky/configs": "^1.0.4",
-    "@types/bun": "^1.1.12"
+    "@softsky/configs": "^1.0.6",
+    "@types/bun": "^1.1.13"
   },
   "files": ["dist/**/*"]
 }

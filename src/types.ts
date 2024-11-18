@@ -8,6 +8,9 @@
 export type Optional<T, K extends keyof any> = Omit<T, K & keyof T> &
   Partial<Pick<T, K & keyof T>>
 
+/** Get contructor type of an instance */
+export type Constructor<T> = abstract new (..._arguments: never[]) => T
+
 /** Recursively resolves promises in objects and arrays */
 export type AwaitedObject<T> = {
   [K in keyof T]: T[K] extends Promise<infer U>

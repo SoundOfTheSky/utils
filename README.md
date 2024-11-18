@@ -117,6 +117,8 @@ Find next cron tick after passed date
 Damn, I **love** TypeScript.
 ### type Optional
 Make keys in object optional
+### type Constructor
+Get contructor type of an instance
 ### type AwaitedObject
 Recursively resolves promises in objects and arrays
 ### type JSONSerializable
