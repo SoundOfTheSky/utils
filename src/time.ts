@@ -5,6 +5,17 @@
 import { HOUR_MS } from './consts'
 import { ValidationError } from './errors'
 
+/** Measure performance of a function */
+export function measurePerformance(function_: () => unknown, timeCheck = 16.6) {
+  const endTime = performance.now() + timeCheck
+  let executions = 0
+  while (performance.now() < endTime) {
+    function_()
+    executions++
+  }
+  return executions
+}
+
 /** Like setInterval but with cron. Returns clear function. */
 export function cronInterval(function_: () => unknown, cronString: string) {
   let timeout: number

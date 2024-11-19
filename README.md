@@ -108,6 +108,8 @@ it will still check them by reference.
 
 ## time
 Timers, CRON, etc.
+### function measurePerformance
+Measure performance of a function
 ### function cronInterval
 Like setInterval but with cron. Returns clear function.
 ### function getNextCron
