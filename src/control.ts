@@ -138,15 +138,19 @@ export class ImmediatePromise<T> extends Promise<T> {
   public resolve!: (value: T | PromiseLike<T>) => void
   public reject!: (reason?: unknown) => void
 
-  public constructor() {
-    let resolve: (value: T | PromiseLike<T>) => void = noop
-    let reject: (reason?: unknown) => void = noop
-    super((r, index) => {
-      resolve = r
-      reject = index
-    })
-    this.resolve = resolve
-    this.reject = reject
+  public constructor(execute?: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void) {
+    if (execute)
+      super(execute)
+    else {
+      let _resolve: (value: T | PromiseLike<T>) => void = noop
+      let _reject: (reason?: unknown) => void = noop
+      super((resolve, reject) => {
+        _resolve = resolve
+        _reject = reject
+      })
+      this.resolve = _resolve
+      this.reject = _reject
+    }
   }
 }
 
