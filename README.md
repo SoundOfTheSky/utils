@@ -19,6 +19,10 @@ If compare returns > 0 it means we have to cut out bigger side of array.
 If compare returns < 0 it means we have to cut out smaller side of array.
 ### function chunk
 Split array into sub arrays of spicified size
+### function combinations
+Return all combinations of items in array
+### function permutations
+Return all permutations of items in array
 
 ## consts
 Some useful consts. That's it.
@@ -77,6 +81,8 @@ Random number between min and max. May enable float
 Same as parseInt but throws
 ### function parseFloat
 Same as parseFloat but throws
+### function factorial
+Factorial
 
 ## objects
 [object Object]

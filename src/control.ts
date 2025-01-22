@@ -138,6 +138,7 @@ export class ImmediatePromise<T> extends Promise<T> {
   public resolve!: (value: T | PromiseLike<T>) => void
   public reject!: (reason?: unknown) => void
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public constructor(execute?: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void) {
     if (execute)
       super(execute)

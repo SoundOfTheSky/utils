@@ -60,3 +60,43 @@ export function chunk<T>(array: T[], chunkSize: number): T[][] {
   while (copy.length > 0) result.push(copy.splice(0, chunkSize))
   return result
 }
+
+/** Return all combinations of items in array */
+export function combinations<T>(array: T[]): T[][] {
+  const amount = 1 << array.length
+  // eslint-disable-next-line unicorn/no-new-array
+  const combinations = new Array(amount) as T[][]
+  for (let combinationIndex = 0; combinationIndex < amount; combinationIndex++) {
+    const combination: T[] = []
+    for (let index = 0; index < array.length; index++)
+      if (combinationIndex >> index & 1)
+        combination.push(array[index]!)
+    combinations[combinationIndex] = combination
+  }
+  return combinations
+}
+
+/** Return all permutations of items in array */
+export function permutations<T>(array: T[]): T[][] {
+  const n = array.length
+
+  const result = [] as T[][]
+  // eslint-disable-next-line unicorn/no-new-array
+  const control = new Array(n).fill(0) as number[]
+  result.push([...array])
+  let index = 0
+  while (index < n) {
+    if (control[index]! < index) {
+      const k = index % 2 === 0 ? 0 : control[index]!
+      swap(array, index, k)
+      result.push([...array])
+      control[index]!++
+      index = 0
+    }
+    else {
+      control[index] = 0
+      index++
+    }
+  }
+  return result
+}
