@@ -64,7 +64,6 @@ export function chunk<T>(array: T[], chunkSize: number): T[][] {
 /** Return all combinations of items in array */
 export function combinations<T>(array: T[]): T[][] {
   const amount = 1 << array.length
-  // eslint-disable-next-line unicorn/no-new-array
   const combinations = new Array(amount) as T[][]
   for (let combinationIndex = 0; combinationIndex < amount; combinationIndex++) {
     const combination: T[] = []
@@ -79,9 +78,7 @@ export function combinations<T>(array: T[]): T[][] {
 /** Return all permutations of items in array */
 export function permutations<T>(array: T[]): T[][] {
   const n = array.length
-
   const result = [] as T[][]
-  // eslint-disable-next-line unicorn/no-new-array
   const control = new Array(n).fill(0) as number[]
   result.push([...array])
   let index = 0

@@ -2,11 +2,13 @@
  * Damn, I **love** TypeScript.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 /** Make keys in object optional */
-export type Optional<T, K extends keyof any> = Omit<T, K & keyof T> &
+export type Optional<T, K extends keyof T> = Omit<T, K & keyof T> &
   Partial<Pick<T, K & keyof T>>
+
+/** Make keys in object required */
+export type RequiredKey<T, K extends keyof T> = Omit<T, K & keyof T> &
+  Required<Pick<T, K & keyof T>>
 
 /** Get contructor type of an instance */
 export type Constructor<T> = abstract new (..._arguments: never[]) => T

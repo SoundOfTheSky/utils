@@ -125,6 +125,8 @@ Find next cron tick after passed date
 Damn, I **love** TypeScript.
 ### type Optional
 Make keys in object optional
+### type RequiredKey
+Make keys in object required
 ### type Constructor
 Get contructor type of an instance
 ### type AwaitedObject
