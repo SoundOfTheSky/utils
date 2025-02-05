@@ -1,6 +1,6 @@
 {
   "name": "@softsky/utils",
-  "version": "1.1.2",
+  "version": "1.2.2",
   "description": "JavaScript/TypeScript utilities",
   "main": "dist/index.js",
   "scripts": {
@@ -20,7 +20,7 @@
   "homepage": "https://github.com/SoundOfTheSky/utils#readme",
   "devDependencies": {
     "@softsky/configs": "^1.1.0",
-    "@types/bun": "^1.2.0"
+    "@types/bun": "^1.2.2"
   },
   "files": ["dist/**/*"]
 }

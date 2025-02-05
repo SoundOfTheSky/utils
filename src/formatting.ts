@@ -2,26 +2,104 @@
  * Anything related to formatting and logging.
  */
 
+/** Type for formatTime ranges */
+export type FormatTimeRange = {
+  start: number
+  pad?: number
+  title?: string
+  delimiter?: string
+}
+
+/** Default time range */
+export const FORMAT_NUMBER_RANGES = [
+  {
+    start: 31_536_000_000,
+    title: 'y',
+  },
+  {
+    start: 86_400_000,
+    title: 'd',
+  },
+  {
+    start: 3_600_000,
+    title: 'h',
+  },
+  {
+    start: 60_000,
+    title: 'm',
+  },
+  {
+    start: 1000,
+    title: 's',
+  },
+  {
+    start: 1,
+    title: 'ms',
+  },
+] satisfies FormatTimeRange[]
+
+/** Time range more suitable for readability */
+export const FORMAT_NUMBER_RANGES_READABLE = [
+  {
+    start: 3_600_000,
+  },
+  {
+    delimiter: ':',
+    start: 60_000,
+    pad: 2,
+  },
+  {
+    delimiter: ':',
+    start: 1000,
+    pad: 2,
+  },
+  {
+    delimiter: '.',
+    start: 1,
+    pad: 3,
+  },
+] satisfies FormatTimeRange[]
+
+/** Bytes range  */
+export const FORMAT_NUMBER_RANGES_BYTES = [
+  {
+    start: 1_099_511_627_776,
+    title: 'TB',
+  },
+  {
+    start: 1_073_741_824,
+    title: 'GB',
+  },
+  {
+    start: 1_048_576,
+    title: 'MB',
+  },
+  {
+    start: 1024,
+    title: 'KB',
+  },
+  {
+    start: 1,
+    title: 'B',
+  },
+] satisfies FormatTimeRange[]
+
 /** Milliseconds to human readable time. Minimum accuracy, if set to 1000 will stop at seconds  */
-export function formatTime(
+export function formatNumber(
   time: number,
   min = 0,
-  ranges: [number, string][] = [
-    [31_536_000_000, 'y'],
-    [86_400_000, 'd'],
-    [3_600_000, 'h'],
-    [60_000, 'm'],
-    [1000, 's'],
-    [1, 'ms'],
-  ],
+  ranges: FormatTimeRange[] = FORMAT_NUMBER_RANGES,
 ) {
   let output = ''
-  for (const [ms, title] of ranges) {
-    if (min && time < min) break
-    if (time < ms) continue
-    const value = Math.trunc(time / ms)
-    if (value !== 0) output += ` ${value}${title}`
-    time %= ms
+  for (const { start, delimiter, pad, title } of ranges) {
+    if (start < min) break
+    if (time < start && !pad) continue
+    let value = (time / start | 0).toString()
+    time %= start
+    if (pad) value = value.padStart(pad, '0')
+    if (output) output += delimiter ?? ' '
+    output += value
+    if (title) output += title
   }
   return output
 }
@@ -48,6 +126,11 @@ export function log(...agrs: unknown[]) {
   console.log(new Date().toLocaleString('ru'), ...agrs)
 }
 
+/** Capitalize first letter */
+export function capitalizeFirstLetter(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1)
+}
+
 /** Can pass streams through to log a progress */
 export class ProgressLoggerTransform<
   T extends { length: number },
@@ -71,13 +154,13 @@ export class ProgressLoggerTransform<
       const speed = (bytes - lastBytes) / logInterval
       message = message
         .replace('%b', formatBytes(bytes))
-        .replace('%t', formatTime(Date.now() - start, 1000))
+        .replace('%t', formatNumber(Date.now() - start, 1000))
         .replace('%s', formatBytes(speed))
       if (maxSize)
         message = message
           .replace(
             '%lt',
-            formatTime(Math.trunc((maxSize - bytes) / speed) * 1000),
+            formatNumber(Math.trunc((maxSize - bytes) / speed) * 1000),
           )
           .replace('%p', Math.trunc((bytes / maxSize) * 100).toString())
           .replace('%s', formatBytes(maxSize))

@@ -65,12 +65,13 @@ export async function retry<T>(
   function_: () => Promise<T>,
   retries = 5,
   interval: number | number[] = 0,
+  ignore?: (error: unknown) => boolean,
 ): Promise<T> {
   try {
     return await function_()
   }
   catch (error) {
-    if (retries === 0) throw error
+    if (retries === 0 || ignore?.(error)) throw error
     await wait(
       typeof interval === 'number'
         ? interval

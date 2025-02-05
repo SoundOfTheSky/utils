@@ -37,3 +37,16 @@ export function factorial(n: number) {
     result *= index
   return result
 }
+
+/** Fibonacci */
+export function fib(n: number) {
+  let a = 0n
+  let b = 1n
+  let temporary = 0n
+  while (n-- > 0) {
+    temporary = a + b
+    a = b
+    b = temporary
+  }
+  return a
+}

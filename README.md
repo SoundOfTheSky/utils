@@ -60,7 +60,15 @@ Returns undefind if nothing found.
 
 ## formatting
 Anything related to formatting and logging.
-### function formatTime
+### type FormatTimeRange
+Type for formatTime ranges
+### const FORMAT_NUMBER_RANGES
+Default time range
+### const FORMAT_NUMBER_RANGES_READABLE
+Time range more suitable for readability
+### const FORMAT_NUMBER_RANGES_BYTES
+Bytes range
+### function formatNumber
 Milliseconds to human readable time. Minimum accuracy, if set to 1000 will stop at seconds
 ### const camelToSnakeCase
 thisCase to this_case
@@ -70,6 +78,8 @@ this_case to thisCase
 Bytes to KB,MB,GB,TB
 ### function log
 Format logging
+### function capitalizeFirstLetter
+Capitalize first letter
 ### class ProgressLoggerTransform
 Can pass streams through to log a progress
 
@@ -83,6 +93,8 @@ Same as parseInt but throws
 Same as parseFloat but throws
 ### function factorial
 Factorial
+### function fib
+Fibonacci
 
 ## objects
 [object Object]
