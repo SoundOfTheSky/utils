@@ -97,3 +97,18 @@ export function permutations<T>(array: T[]): T[][] {
   }
   return result
 }
+
+/**
+ * Push data in array so array is always kept sorted
+ *
+ * @param array Target array
+ * @param element Element to push
+ * @param compare Function to find place to push.
+ * Return true when found position to push in.
+ * For example if we return `[false, false, true, false]`,
+ * Array will become `[false, false, Element, true, false]`.
+ */
+export function pushToSorted<T>(array: T[], element: T, compare: (element: T) => boolean) {
+  const index = array.findIndex(compare)
+  array.splice(index === -1 ? array.length : index, 0, element)
+}

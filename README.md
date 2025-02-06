@@ -23,6 +23,15 @@ Split array into sub arrays of spicified size
 Return all combinations of items in array
 ### function permutations
 Return all permutations of items in array
+### function pushToSorted
+Push data in array so array is always kept sorted
+
+@param array Target array
+@param element Element to push
+@param compare Function to find place to push.
+Return true when found position to push in.
+For example if we return `[false, false, true, false]`,
+Array will become `[false, false, Element, true, false]`.
 
 ## consts
 Some useful consts. That's it.
