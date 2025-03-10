@@ -55,6 +55,8 @@ Promise that accepts no callback, but exposes `resolve` and `reject` methods
 setTimeout promisify
 ### const noop
 Empty function that does nothing
+### async function concurrentRun
+Run array of async tasks concurrently
 
 ## errors
 Custom errors, finding errors and error handling.
@@ -89,8 +91,6 @@ Bytes to KB,MB,GB,TB
 Format logging
 ### function capitalizeFirstLetter
 Capitalize first letter
-### class ProgressLoggerTransform
-Can pass streams through to log a progress
 
 ## numbers
 Numbers, math, etc.
@@ -141,6 +141,12 @@ Measure performance of a function
 Like setInterval but with cron. Returns clear function.
 ### function getNextCron
 Find next cron tick after passed date
+### class SpeedCalculator
+Object that calculates speed, ETA and percent of any measurable task.
+
+`push()` chunks into speed calculator and then read `stats` for results.
+`size` - a target then task is finished. Without it only speed is calculated.
+`historyTime` - is a time period based on which speed will be calculated.
 
 ## types
 Damn, I **love** TypeScript.

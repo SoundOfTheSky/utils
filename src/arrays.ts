@@ -46,8 +46,7 @@ export function binarySearch(size: number, compare: (index: number) => number) {
     if (compared === 0) {
       position = mid
       break
-    }
-    else if (compared > 0) high = mid - 1
+    } else if (compared > 0) high = mid - 1
     else low = mid + 1
   }
   return position
@@ -65,11 +64,14 @@ export function chunk<T>(array: T[], chunkSize: number): T[][] {
 export function combinations<T>(array: T[]): T[][] {
   const amount = 1 << array.length
   const combinations = new Array(amount) as T[][]
-  for (let combinationIndex = 0; combinationIndex < amount; combinationIndex++) {
+  for (
+    let combinationIndex = 0;
+    combinationIndex < amount;
+    combinationIndex++
+  ) {
     const combination: T[] = []
     for (let index = 0; index < array.length; index++)
-      if (combinationIndex >> index & 1)
-        combination.push(array[index]!)
+      if ((combinationIndex >> index) & 1) combination.push(array[index]!)
     combinations[combinationIndex] = combination
   }
   return combinations
@@ -89,8 +91,7 @@ export function permutations<T>(array: T[]): T[][] {
       result.push([...array])
       control[index]!++
       index = 0
-    }
-    else {
+    } else {
       control[index] = 0
       index++
     }
@@ -108,7 +109,11 @@ export function permutations<T>(array: T[]): T[][] {
  * For example if we return `[false, false, true, false]`,
  * Array will become `[false, false, Element, true, false]`.
  */
-export function pushToSorted<T>(array: T[], element: T, compare: (element: T) => boolean) {
+export function pushToSorted<T>(
+  array: T[],
+  element: T,
+  compare: (element: T) => boolean,
+) {
   const index = array.findIndex(compare)
   array.splice(index === -1 ? array.length : index, 0, element)
 }

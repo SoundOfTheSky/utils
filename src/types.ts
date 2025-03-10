@@ -19,7 +19,7 @@ export type AwaitedObject<T> = {
     ? U
     : T[K] extends object
       ? AwaitedObject<T[K]>
-      : T[K];
+      : T[K]
 }
 
 /** Anything that can be serialized to JSON */
@@ -34,7 +34,7 @@ export type JSONSerializable =
 
 /** Adds prefix to all keys in object */
 export type ObjectAddPrefix<T, P extends string> = {
-  [K in keyof T as `${P}${string & K}`]: T[K];
+  [K in keyof T as `${P}${string & K}`]: T[K]
 }
 
 /** Convert type of thisCase to this_case */
@@ -47,7 +47,7 @@ export type CamelToSnakeCase<S extends string> =
 
 /** Convert object keys of thisCase to this_case */
 export type ObjectCamelToSnakeCase<T> = {
-  [K in keyof T as CamelToSnakeCase<string & K>]: T[K];
+  [K in keyof T as CamelToSnakeCase<string & K>]: T[K]
 }
 
 /** Convert type of this-case to thisCase */
@@ -57,7 +57,7 @@ export type SnakeToCamel<S extends string> = S extends `${infer T}_${infer U}`
 
 /** Convert object keys of this-case to thisCase */
 export type ObjectSnakeToCamel<T> = {
-  [K in keyof T as SnakeToCamel<string & K>]: T[K];
+  [K in keyof T as SnakeToCamel<string & K>]: T[K]
 }
 
 /** Concat types of array or objects */

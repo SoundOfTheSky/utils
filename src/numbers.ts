@@ -33,8 +33,7 @@ export function parseFloat(parameter: unknown) {
 export function factorial(n: number) {
   if (n === 0 || n === 1) return 1
   let result = 1
-  for (let index = 2; index <= n; index++)
-    result *= index
+  for (let index = 2; index <= n; index++) result *= index
   return result
 }
 

@@ -60,8 +60,7 @@ function findErrorTextInString(
 ): string | undefined {
   try {
     return findErrorText(JSON.parse(error), priorityErrorKeys, stack)
-  }
-  catch {
+  } catch {
     if (error.length < 4 || error === '[object Object]') return
     return error
   }
@@ -79,8 +78,7 @@ function findErrorTextInObject(
         if (!Number.isNaN(key)) score = priorityErrorKeys.length
         else if (typeof error[key] === 'function') {
           score = Number.MAX_SAFE_INTEGER - 1
-        }
-        else {
+        } else {
           score = Number.MAX_SAFE_INTEGER
         }
       }

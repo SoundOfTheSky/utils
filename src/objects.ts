@@ -66,11 +66,11 @@ export function deepEquals(
   // Primitives
   if (a === b) return true
   if (
-    typeof a !== typeof b
-    || typeof a !== 'object'
-    || typeof b !== 'object'
-    || a === null
-    || b === null
+    typeof a !== typeof b ||
+    typeof a !== 'object' ||
+    typeof b !== 'object' ||
+    a === null ||
+    b === null
   )
     return false
   // Assume that already checked objects are equal
@@ -86,14 +86,13 @@ export function deepEquals(
   }
   if (Array.isArray(b)) return false
   // Dates
-  if (a instanceof Date)
-    return b instanceof Date && a.getTime() === b.getTime()
+  if (a instanceof Date) return b instanceof Date && a.getTime() === b.getTime()
   if (b instanceof Date) return false
   // Iterables
   if (Symbol.iterator in a)
     return (
-      Symbol.iterator in b
-      && deepEquals(
+      Symbol.iterator in b &&
+      deepEquals(
         [...(a as Iterable<unknown>)],
         [...(b as Iterable<unknown>)],
         stack,
@@ -106,8 +105,8 @@ export function deepEquals(
   if (aKeys.size !== bKeys.size) return false
   for (const property of getPropertyNames(a))
     if (
-      !bKeys.has(property)
-      || !deepEquals(
+      !bKeys.has(property) ||
+      !deepEquals(
         a[property as keyof typeof a],
         b[property as keyof typeof b],
         stack,

@@ -94,7 +94,7 @@ export function formatNumber(
   for (const { start, delimiter, pad, title } of ranges) {
     if (start < min) break
     if (time < start && !pad) continue
-    let value = (time / start | 0).toString()
+    let value = ((time / start) | 0).toString()
     time %= start
     if (pad) value = value.padStart(pad, '0')
     if (output) output += delimiter ?? ' '
@@ -106,11 +106,11 @@ export function formatNumber(
 
 /** thisCase to this_case */
 export const camelToSnakeCase = (string_: string) =>
-  string_.replaceAll(/[A-Z]+/g, letter => `_${letter.toLowerCase()}`)
+  string_.replaceAll(/[A-Z]+/g, (letter) => `_${letter.toLowerCase()}`)
 
 /** this_case to thisCase */
 export const snakeToCamelCase = (string_: string) =>
-  string_.replaceAll(/_[a-z]/g, letter => letter[1]!.toUpperCase())
+  string_.replaceAll(/_[a-z]/g, (letter) => letter[1]!.toUpperCase())
 
 /** Bytes to KB,MB,GB,TB */
 export function formatBytes(bytes: number) {
@@ -129,43 +129,4 @@ export function log(...agrs: unknown[]) {
 /** Capitalize first letter */
 export function capitalizeFirstLetter(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1)
-}
-
-/** Can pass streams through to log a progress */
-export class ProgressLoggerTransform<
-  T extends { length: number },
-> extends TransformStream<T> {
-  public constructor(string_: string, logInterval: number, maxSize?: number) {
-    let bytes = 0
-    const start = Date.now()
-    let lastBytes = 0
-    super({
-      transform(chunk, controller) {
-        controller.enqueue(chunk)
-        bytes += chunk.length
-      },
-      flush() {
-        clearInterval(interval)
-        log('Done!')
-      },
-    })
-    const interval = setInterval(() => {
-      let message = string_
-      const speed = (bytes - lastBytes) / logInterval
-      message = message
-        .replace('%b', formatBytes(bytes))
-        .replace('%t', formatNumber(Date.now() - start, 1000))
-        .replace('%s', formatBytes(speed))
-      if (maxSize)
-        message = message
-          .replace(
-            '%lt',
-            formatNumber(Math.trunc((maxSize - bytes) / speed) * 1000),
-          )
-          .replace('%p', Math.trunc((bytes / maxSize) * 100).toString())
-          .replace('%s', formatBytes(maxSize))
-      log(message)
-      lastBytes = bytes
-    }, logInterval * 1000)
-  }
 }

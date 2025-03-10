@@ -69,8 +69,7 @@ export async function retry<T>(
 ): Promise<T> {
   try {
     return await function_()
-  }
-  catch (error) {
+  } catch (error) {
     if (retries === 0 || ignore?.(error)) throw error
     await wait(
       typeof interval === 'number'
@@ -139,9 +138,13 @@ export class ImmediatePromise<T> extends Promise<T> {
   public resolve!: (value: T | PromiseLike<T>) => void
   public reject!: (reason?: unknown) => void
 
-  public constructor(execute?: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void) {
-    if (execute)
-      super(execute)
+  public constructor(
+    execute?: (
+      resolve: (value: T | PromiseLike<T>) => void,
+      reject: (reason?: any) => void,
+    ) => void,
+  ) {
+    if (execute) super(execute)
     else {
       let _resolve: (value: T | PromiseLike<T>) => void = noop
       let _reject: (reason?: unknown) => void = noop
@@ -162,7 +165,7 @@ export default async function deepPromiseAll<T>(
   if (input instanceof Promise) return deepPromiseAll(await input)
   if (Array.isArray(input))
     return Promise.all(
-      input.map(item => deepPromiseAll(item)),
+      input.map((item) => deepPromiseAll(item)),
     ) as AwaitedObject<T>
   if (typeof input === 'object' && input !== null) {
     return Object.fromEntries(
@@ -178,8 +181,44 @@ export default async function deepPromiseAll<T>(
 }
 
 /** setTimeout promisify */
-export const wait = (time: number) => new Promise(r => setTimeout(r, time))
+export const wait = (time: number) => new Promise((r) => setTimeout(r, time))
 
 /** Empty function that does nothing */
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export const noop = () => {}
+
+/** Run array of async tasks concurrently */
+export async function concurrentRun<T>(
+  tasks: (() => Promise<T>)[],
+  concurrency = 4,
+): Promise<T[]> {
+  return new Promise((resolve, reject) => {
+    const results = new Array(tasks.length) as T[]
+    let inProgress = 0
+    let index = 0
+    let completed = 0
+
+    function runNext() {
+      if (completed === tasks.length) {
+        resolve(results)
+        return
+      }
+
+      while (inProgress < concurrency && index < tasks.length) {
+        const currentIndex = index++
+        const task = tasks[currentIndex]!
+        inProgress++
+        task()
+          .then((result) => {
+            results[currentIndex] = result
+            inProgress--
+            completed++
+            runNext()
+          })
+          .catch(reject)
+      }
+    }
+
+    runNext()
+  })
+}
