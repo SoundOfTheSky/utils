@@ -170,10 +170,10 @@ export default async function deepPromiseAll<T>(
   if (typeof input === 'object' && input !== null) {
     return Object.fromEntries(
       await Promise.all(
-        Object.entries(input).map(async ([key, value]) => [
-          key,
-          await deepPromiseAll(value),
-        ]),
+        Object.entries(input).map(
+          async ([key, value]) =>
+            [key, await deepPromiseAll(value)] as [string, unknown][],
+        ),
       ),
     ) as AwaitedObject<T>
   }

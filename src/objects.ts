@@ -14,28 +14,34 @@ export function getPropertyNames(object: object, keys = new Set()) {
 }
 
 /** Map function like for arrays, but for objects */
-export const objectMap = (
-  object: object,
-  function_: (key: string, value: unknown) => [string, unknown],
-) =>
-  Object.fromEntries(
-    Object.entries(object).map(([key, value]) => function_(key, value)),
+export function objectMap<T extends object>(
+  object: T,
+  function_: (key: keyof T, value: T[keyof T]) => [string, unknown],
+) {
+  return Object.fromEntries(
+    Object.entries(object).map(([key, value]) =>
+      function_(key as keyof T, value as T[keyof T]),
+    ),
   )
+}
 
 /** Filter function like for arrays, but for objects */
-export const objectFilter = (
-  object: object,
-  function_: (key: string, value: unknown) => unknown,
-) =>
-  Object.fromEntries(
-    Object.entries(object).filter(([key, value]) => function_(key, value)),
+export function objectFilter<T extends object>(
+  object: T,
+  function_: (key: keyof T, value: T[keyof T]) => unknown,
+) {
+  return Object.fromEntries(
+    Object.entries(object).filter(([key, value]) =>
+      function_(key as keyof T, value as T[keyof T]),
+    ),
   )
+}
 
 /** Adds prefix to every key in object */
 export function addPrefixToObject<
   T extends Record<string, unknown>,
   P extends string,
->(object: Record<string, T>, prefix: P): ObjectAddPrefix<T, P> {
+>(object: T, prefix: P): ObjectAddPrefix<T, P> {
   const n: Record<string, unknown> = {}
   for (const key in object) n[prefix + key] = object[key]
   return n as ObjectAddPrefix<T, P>
@@ -46,7 +52,7 @@ export function addPrefixToObject<
  * **Supports:**
  * - All primitives (String, Number, BigNumber, Null, undefined, Symbol)
  * - Objects
- * - Iterables (Arrays, Map, Sets, Queries, etc.)
+ * - Iterables (Arrays, Map, Sets, Queries, Generators etc.)
  * - Dates
  *
  * **Not supported:**
@@ -88,7 +94,19 @@ export function deepEquals(
   // Dates
   if (a instanceof Date) return b instanceof Date && a.getTime() === b.getTime()
   if (b instanceof Date) return false
-  // Iterables
+  // Sets and maps (must be sorted)
+  if (a instanceof Set || a instanceof Map) {
+    return (
+      (b instanceof Set || b instanceof Map) &&
+      deepEquals(
+        [...(a as Iterable<unknown>)].sort(),
+        [...(b as Iterable<unknown>)].sort(),
+        stack,
+      )
+    )
+  }
+  if (b instanceof Set || b instanceof Map) return false
+  // All iterabels
   if (Symbol.iterator in a)
     return (
       Symbol.iterator in b &&
@@ -114,4 +132,17 @@ export function deepEquals(
     )
       return false
   return true
+}
+
+/** Pick keys from object */
+export function pick<T extends object, K extends keyof T>(
+  object: T,
+  keys: K[],
+): Pick<T, K> {
+  const newObject: Partial<T> = {}
+  for (let index = 0; index < keys.length; index++) {
+    const key = keys[index]!
+    newObject[key] = object[key]
+  }
+  return newObject as Pick<T, K>
 }

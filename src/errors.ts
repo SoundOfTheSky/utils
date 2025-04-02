@@ -21,6 +21,8 @@ const defaultPriorityErrorKeys = [
   'error',
   'errors',
   'err',
+  'body',
+  'payload',
   'e',
 ]
 
@@ -59,7 +61,7 @@ function findErrorTextInString(
   stack = new Set(),
 ): string | undefined {
   try {
-    return findErrorText(JSON.parse(error), priorityErrorKeys, stack)
+    return findErrorText(JSON.parse(error) as object, priorityErrorKeys, stack)
   } catch {
     if (error.length < 4 || error === '[object Object]') return
     return error
@@ -71,23 +73,25 @@ function findErrorTextInObject(
   priorityErrorKeys = defaultPriorityErrorKeys,
   stack = new Set(),
 ): string | undefined {
-  const keys = ([...getPropertyNames(error)] as (keyof typeof error)[])
+  const keys = [...getPropertyNames(error)]
     .map((key) => {
-      let score = priorityErrorKeys.indexOf(key)
-      if (score === -1) {
-        if (!Number.isNaN(key)) score = priorityErrorKeys.length
-        else if (typeof error[key] === 'function') {
-          score = Number.MAX_SAFE_INTEGER - 1
-        } else {
-          score = Number.MAX_SAFE_INTEGER
-        }
-      }
+      const value = error[key as keyof typeof error] as unknown
+      let score = priorityErrorKeys.indexOf(key as string)
+      if (score === -1)
+        score =
+          typeof value === 'string'
+            ? priorityErrorKeys.length + value.length
+            : Number.MAX_SAFE_INTEGER
       return [key, score] as const
     })
-    .sort(([, v], [, v2]) => v - v2)
+    .sort(([_, score], [_2, score2]) => score - score2)
     .map(([k]) => k)
   for (const key of keys) {
-    const result = findErrorText(error[key], priorityErrorKeys, stack)
+    const result = findErrorText(
+      error[key as keyof typeof error],
+      priorityErrorKeys,
+      stack,
+    )
     if (result) return result
   }
 }

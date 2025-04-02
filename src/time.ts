@@ -16,14 +16,18 @@ export function measurePerformance(function_: () => unknown, timeCheck = 16.6) {
   return executions
 }
 
-/** Like setInterval but with cron. Returns clear function. */
+/** Like setInterval but with cron.
+ *  Returns clear function.
+ *  For cron string syntax check __getNextCron()__ description */
 export function cronInterval(function_: () => unknown, cronString: string) {
   let timeout: number
   let next = getNextCron(cronString).getTime()
   const r = () => {
-    const d = Date.now() - next
+    const now = Date.now()
+    let d = next - now
     if (d < 1) {
       next = getNextCron(cronString).getTime()
+      d = next - now
       function_()
     }
     timeout = setTimeout(r, Math.min(d, HOUR_MS)) as unknown as number
@@ -34,16 +38,24 @@ export function cronInterval(function_: () => unknown, cronString: string) {
   }
 }
 
-/** Find next cron tick after passed date */
+/** Find next cron date after passed date.
+ *
+ * This function __DOES NOT__ implement regular CRON 1 to 1.
+ *
+ * Main differences:
+ * - Weekdays value only 0 to 6 (0 is Sunday)
+ * - New supported syntax: __30-60/10__ - means __30,40,50,60__
+ * - Second and millisecond support: __* * * * * 30 999__ - executes every 30 seconds at the end of a second
+ */
 export function getNextCron(cronString: string, datetime = new Date()) {
   const cron = cronString.split(' ')
-  if (cron.length !== 5)
-    throw new ValidationError('Only 5 cron params supported')
-  const dt = new Date(datetime)
-  dt.setSeconds(0, 0)
+  for (let index = cron.length; index < 7; index++)
+    cron.unshift(index === 3 || index === 4 ? '1' : '0')
+  const dt = new Date(datetime.getTime() + 1)
   const items = [
+    // Weekdays
     [
-      parseCronItem(cron[4]!, 0, 6),
+      parseCronItem(cron[6]!, 0, 6),
       dt.getDay.bind(dt),
       (x: number) =>
         dt.setDate(
@@ -51,84 +63,100 @@ export function getNextCron(cronString: string, datetime = new Date()) {
             (dt.getDay() < x ? x - dt.getDay() : 7 - dt.getDay() + x),
         ),
     ],
+    // Months
     [
-      parseCronItem(cron[3]!, 1, 12),
+      parseCronItem(cron[5]!, 1, 12),
       () => dt.getMonth() + 1,
       (x: number) => dt.setMonth(x - 1),
     ],
-    [parseCronItem(cron[2]!, 1, 31), dt.getDate.bind(dt), dt.setDate.bind(dt)],
+    // Dates
+    [parseCronItem(cron[4]!, 1, 31), dt.getDate.bind(dt), dt.setDate.bind(dt)],
+    // Hours
     [
-      parseCronItem(cron[1]!, 0, 23),
+      parseCronItem(cron[3]!, 0, 23),
       dt.getHours.bind(dt),
       dt.setHours.bind(dt),
     ],
+    // Minutes
     [
-      parseCronItem(cron[0]!, 0, 59),
+      parseCronItem(cron[2]!, 0, 59),
       dt.getMinutes.bind(dt),
       dt.setMinutes.bind(dt),
     ],
+    // Seconds
+    [
+      parseCronItem(cron[1]!, 0, 59),
+      dt.getSeconds.bind(dt),
+      dt.setSeconds.bind(dt),
+    ],
+    // Milliseconds
+    [
+      parseCronItem(cron[0]!, 0, 999),
+      dt.getMilliseconds.bind(dt),
+      dt.setMilliseconds.bind(dt),
+    ],
   ] as const
-  function r() {
-    for (let index = 0; index < items.length; index++) {
-      const [ok, getN, setN] = items[index]!
-      const n = getN()
-      // If OK continue
-      if (ok.includes(n)) continue
-      // If not ok, change every possible lower value lowest ok
-      for (
-        let index2 = index === 0 ? 3 : index + 1;
-        index2 < items.length;
-        index2++
-      ) {
-        const [ok, , setN] = items[index2]!
-        setN(ok[0]!)
+  for (let index = 0; index < items.length; index++) {
+    const [ok, getN, setN] = items[index]!
+    const n = getN()
+    // If OK continue
+    if (ok.includes(n)) continue
+    // If not ok, change every possible lower value lowest ok
+    for (
+      // If weekday(0) start from days
+      let index2 = index === 0 ? 3 : index + 1;
+      index2 < items.length;
+      index2++
+    ) {
+      const [ok, , setN] = items[index2]!
+      setN(ok[0]!)
+    }
+    const found = ok.find((x) => x > n)
+    if (found) setN(found)
+    else {
+      // Set lowest value, increase item before and recheck everything
+      setN(ok[0]!)
+      if (index === 1) dt.setFullYear(dt.getFullYear() + 1)
+      else if (index > 1) {
+        const [, getN, setN] = items[index - 1]!
+        setN(getN() + 1)
       }
-      const found = ok.find((x) => x > n)
-      if (found) setN(found)
-      else {
-        // Set lowest value, increase item before and recheck everything
-        setN(ok[0]!)
-        if (index > 1) {
-          const [, getN, setN] = items[index - 1]!
-          setN(getN() + 1)
-          r()
-        }
-        break
-      }
+      index = 0
     }
   }
-  r()
   return dt
 }
 
+// TODO: optimize
 function parseCronItem(cronString: string, min: number, max: number): number[] {
   const cron = cronString.split(',')
   const ok = new Set<number>()
   const error = new ValidationError(`Can't parse CRON string: ${cronString}`)
-  for (const item of cron) {
+  for (let item of cron) {
+    item = item.trim()
     // If everything add every possible value and skip others
     if (item === '*') {
       for (let index = min; index <= max; index++) ok.add(index)
       break
     }
-    // If range
-    let split = item.split('-')
-    if (split.length === 2) {
-      const a = Number.parseInt(split[0]!)
-      const b = Number.parseInt(split[1]!)
-      if (Number.isNaN(a) || Number.isNaN(b) || a < min || a > b || b > max)
-        throw error
-      for (let index = a; index <= b; index++) ok.add(index)
-      continue
-    }
     // If stepped
-    split = item.split('/')
+    let split = item.split('/')
     if (split.length === 2) {
       const step = Number.parseInt(split[1]!)
       if (Number.isNaN(step)) throw error
       const items = parseCronItem(split[0]!, min, max)
       for (let index = 0; index < items.length; index += step)
         ok.add(items[index]!)
+      continue
+    }
+    // If range
+    split = item.split('-')
+    if (split.length === 2) {
+      const a = Number.parseInt(split[0]!)
+      const b = Number.parseInt(split[1]!)
+      if (Number.isNaN(a) || Number.isNaN(b) || a < min || a > b || b > max)
+        throw error
+      for (let index = a; index <= b; index++) ok.add(index)
       continue
     }
     // If everything else failed check for simple number

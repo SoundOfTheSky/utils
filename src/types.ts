@@ -14,13 +14,14 @@ export type RequiredKey<T, K extends keyof T> = Omit<T, K & keyof T> &
 export type Constructor<T> = abstract new (..._arguments: never[]) => T
 
 /** Recursively resolves promises in objects and arrays */
-export type AwaitedObject<T> = {
-  [K in keyof T]: T[K] extends Promise<infer U>
-    ? U
-    : T[K] extends object
-      ? AwaitedObject<T[K]>
-      : T[K]
-}
+export type AwaitedObject<T> =
+  T extends Promise<infer U>
+    ? AwaitedObject<U>
+    : T extends (infer U)[]
+      ? AwaitedObject<U>[]
+      : T extends object
+        ? { [K in keyof T]: AwaitedObject<T[K]> }
+        : T
 
 /** Anything that can be serialized to JSON */
 export type JSONSerializable =

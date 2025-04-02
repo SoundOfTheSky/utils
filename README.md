@@ -1,29 +1,53 @@
 # Sky utils
 **JavaScript/TypeScript utilities**
 
-Basically library, but it's too simple to be on npm.
+Utils library. 
 
-## arrays
+`npm i @softsky/utils`
+
+Usual utils plus more obscure stuff that I've never seen in any library. 
+Also fancy TypeScript generics and types that I often use.
+
+Test coverage __100%__.
+
+# Contribute
+I don't know why would you want to, but here's how to:
+1. Install Bun
+2. Install dependencies `bun i` or `npm i`
+3. Lint files `bun run lint`
+4. Run tests `bun run test`
+5. Update README `bun run gen-readme`
+6. Create merge request
+
+Don't forget to follow comment style for new exported features:
+```ts
+/** Description of how it works (REQUIRED) */
+export function newStuff() {}
+```
+
+# Full feature list:
+
+## Arrays
 Everything array related.
-### function randomFromArray
+### function _randomFromArray_
 Returns random element from non-empty array
-### function shuffleArray
+### function _shuffleArray_
 Create new shuffled array
-### function swap
+### function _swap_
 Swap two elements in array
-### function binarySearch
+### function _binarySearch_
 Binary search in sorted array.
 Compare function should compare your needed value with value on index passed to it.
 If compare returns 0 it means we found target.
 If compare returns > 0 it means we have to cut out bigger side of array.
 If compare returns < 0 it means we have to cut out smaller side of array.
-### function chunk
+### function _chunk_
 Split array into sub arrays of spicified size
-### function combinations
+### function _combinations_
 Return all combinations of items in array
-### function permutations
+### function _permutations_
 Return all permutations of items in array
-### function pushToSorted
+### function _pushToSorted_
 Push data in array so array is always kept sorted
 
 @param array Target array
@@ -33,95 +57,95 @@ Return true when found position to push in.
 For example if we return `[false, false, true, false]`,
 Array will become `[false, false, Element, true, false]`.
 
-## consts
+## Consts
 Some useful consts. That's it.
 
-## control
+## Control
 Utils related to code execution flow.
-### const UUID
+### const _UUID_
 Get unique id
-### async function retry
+### async function _retry_
 Retry async function
-### function createDebouncedFunction
+### function _createDebouncedFunction_
 Create debounced function. Basically adds cooldown to function. Warning: throws!
-### function createThrottledFunction
+### function _createThrottledFunction_
 Create throttled function. Basically limits function calls in time period. Warning: throws!
-### function createDelayedFunction
+### function _createDelayedFunction_
 Create debounced function. Basically create function that will be called with delay,
 but if another call comes in, we reset the timer.
-### class ImmediatePromise
+### class _ImmediatePromise_
 Promise that accepts no callback, but exposes `resolve` and `reject` methods
-### const wait
+### const _wait_
 setTimeout promisify
-### const noop
+### const _noop_
 Empty function that does nothing
-### async function concurrentRun
+### async function _concurrentRun_
 Run array of async tasks concurrently
 
-## errors
+## Errors
 Custom errors, finding errors and error handling.
-### class ValidationError
+### class _ValidationError_
 Use as intended error. Basically 4** errors in HTTP
-### function findErrorText
+### function _findErrorText_
 Find error inside anything recursively.
 Good for finding human-readable errors.
 Tries priority keys first.
 Parses JSON automatically.
 Returns undefind if nothing found.
 
-## formatting
+## Formatting
 Anything related to formatting and logging.
-### type FormatTimeRange
+### type _FormatTimeRange_
 Type for formatTime ranges
-### const FORMAT_NUMBER_RANGES
+### const _FORMAT_NUMBER_RANGES_
 Default time range
-### const FORMAT_NUMBER_RANGES_READABLE
+### const _FORMAT_NUMBER_RANGES_READABLE_
 Time range more suitable for readability
-### const FORMAT_NUMBER_RANGES_BYTES
+### const _FORMAT_NUMBER_RANGES_BYTES_
 Bytes range
-### function formatNumber
+### function _formatNumber_
 Milliseconds to human readable time. Minimum accuracy, if set to 1000 will stop at seconds
-### const camelToSnakeCase
+### const _camelToSnakeCase_
 thisCase to this_case
-### const snakeToCamelCase
+### const _snakeToCamelCase_
 this_case to thisCase
-### function formatBytes
+### function _formatBytes_
 Bytes to KB,MB,GB,TB
-### function log
+### function _log_
 Format logging
-### function capitalizeFirstLetter
+### function _capitalizeFirstLetter_
 Capitalize first letter
 
-## numbers
+## Numbers
 Numbers, math, etc.
-### function random
+### function _random_
 Random number between min and max. May enable float
-### function parseInt
+### function _parseInt_
 Same as parseInt but throws
-### function parseFloat
+### function _parseFloat_
 Same as parseFloat but throws
-### function factorial
+### function _factorial_
 Factorial
-### function fib
+### function _fib_
 Fibonacci
 
-## objects
+## Objects
 [object Object]
-### function getPropertyNames
+### function _getPropertyNames_
 Get all prorerty names, including in prototype
-### const objectMap
+### function _objectMap_
 Map function like for arrays, but for objects
-### const objectFilter
+### function _objectFilter_
 Filter function like for arrays, but for objects
-### function addPrefixToObject
+### function _addPrefixToObject_
 Adds prefix to every key in object
-### function deepEquals
+### function _deepEquals_
 Check if objects are deep equal
 
 **Supports:**
 - All primitives (String, Number, BigNumber, Null, undefined, Symbol)
 - Objects
-- Iterables (Arrays, Map, Sets, Queries, etc.)
+- Iterables (Arrays, Map, Sets, Queries, Generators etc.)
 - Dates
 
 **Not supported:**
@@ -132,43 +156,45 @@ Check if objects are deep equal
 
 Behavior with object above are not defined, but
 it will still check them by reference.
+### function _pick_
+Pick keys from object
 
-## time
+## Time
 Timers, CRON, etc.
-### function measurePerformance
+### function _measurePerformance_
 Measure performance of a function
-### function cronInterval
-Like setInterval but with cron. Returns clear function.
-### function getNextCron
-Find next cron tick after passed date
-### class SpeedCalculator
+### function _cronInterval_
+Like setInterval but with cron.
+Returns clear function.
+For cron string syntax check __getNextCron()__ description
+### class _SpeedCalculator_
 Object that calculates speed, ETA and percent of any measurable task.
 
 `push()` chunks into speed calculator and then read `stats` for results.
 `size` - a target then task is finished. Without it only speed is calculated.
 `historyTime` - is a time period based on which speed will be calculated.
 
-## types
+## Types
 Damn, I **love** TypeScript.
-### type Optional
+### type _Optional_
 Make keys in object optional
-### type RequiredKey
+### type _RequiredKey_
 Make keys in object required
-### type Constructor
+### type _Constructor_
 Get contructor type of an instance
-### type AwaitedObject
+### type _AwaitedObject_
 Recursively resolves promises in objects and arrays
-### type JSONSerializable
+### type _JSONSerializable_
 Anything that can be serialized to JSON
-### type ObjectAddPrefix
+### type _ObjectAddPrefix_
 Adds prefix to all keys in object
-### type CamelToSnakeCase
+### type _CamelToSnakeCase_
 Convert type of thisCase to this_case
-### type ObjectCamelToSnakeCase
+### type _ObjectCamelToSnakeCase_
 Convert object keys of thisCase to this_case
-### type SnakeToCamel
+### type _SnakeToCamel_
 Convert type of this-case to thisCase
-### type ObjectSnakeToCamel
+### type _ObjectSnakeToCamel_
 Convert object keys of this-case to thisCase
-### type Concat
+### type _Concat_
 Concat types of array or objects
