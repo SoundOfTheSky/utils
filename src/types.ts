@@ -2,6 +2,19 @@
  * Damn, I **love** TypeScript.
  */
 
+/** Values that are copied by value, not by reference */
+export type Primitive =
+  | string
+  | number
+  | bigint
+  | boolean
+  | symbol
+  | null
+  | undefined
+
+/** Values that convert to false */
+export type Falsy = false | '' | 0 | null | undefined
+
 /** Make keys in object optional */
 export type Optional<T, K extends keyof T> = Omit<T, K & keyof T> &
   Partial<Pick<T, K & keyof T>>
@@ -11,7 +24,7 @@ export type RequiredKey<T, K extends keyof T> = Omit<T, K & keyof T> &
   Required<Pick<T, K & keyof T>>
 
 /** Get contructor type of an instance */
-export type Constructor<T> = abstract new (..._arguments: never[]) => T
+export type Constructor<T> = abstract new (..._arguments: any[]) => T
 
 /** Recursively resolves promises in objects and arrays */
 export type AwaitedObject<T> =

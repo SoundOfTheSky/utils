@@ -102,10 +102,7 @@ export function permutations<T>(array: T[]): T[][] {
 /**
  * Push data in array so array is always kept sorted
  *
- * @param array Target array
- * @param element Element to push
- * @param compare Function to find place to push.
- * Return true when found position to push in.
+ * Compare must return true when found position to push in.
  * For example if we return `[false, false, true, false]`,
  * Array will become `[false, false, Element, true, false]`.
  */

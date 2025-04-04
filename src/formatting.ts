@@ -105,13 +105,13 @@ export function formatNumber(
 }
 
 /** thisCase to this_case */
-export const camelToSnakeCase = (string_: string) =>
-  string_.replaceAll(/[A-Z]+/g, (letter) => `_${letter.toLowerCase()}`)
-
+export function camelToSnakeCase(string_: string) {
+  return string_.replaceAll(/[A-Z]+/g, (letter) => `_${letter.toLowerCase()}`)
+}
 /** this_case to thisCase */
-export const snakeToCamelCase = (string_: string) =>
-  string_.replaceAll(/_[a-z]/g, (letter) => letter[1]!.toUpperCase())
-
+export function snakeToCamelCase(string_: string) {
+  return string_.replaceAll(/_[a-z]/g, (letter) => letter[1]!.toUpperCase())
+}
 /** Bytes to KB,MB,GB,TB */
 export function formatBytes(bytes: number) {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB']

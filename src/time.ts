@@ -40,13 +40,12 @@ export function cronInterval(function_: () => unknown, cronString: string) {
 
 /** Find next cron date after passed date.
  *
- * This function __DOES NOT__ implement regular CRON 1 to 1.
+ *  This function __DOES NOT__ implement regular CRON 1 to 1.
  *
- * Main differences:
- * - Weekdays value only 0 to 6 (0 is Sunday)
- * - New supported syntax: __30-60/10__ - means __30,40,50,60__
- * - Second and millisecond support: __* * * * * 30 999__ - executes every 30 seconds at the end of a second
- */
+ *  Main differences:
+ *  - Weekdays value only 0 to 6 (0 is Sunday)
+ *  - New supported syntax: __30-60/10__ - means __30,40,50,60__
+ *  - Second and millisecond support: __* * * * * 30 999__ - executes every 30 seconds at the end of a second */
 export function getNextCron(cronString: string, datetime = new Date()) {
   const cron = cronString.split(' ')
   for (let index = cron.length; index < 7; index++)
@@ -127,13 +126,12 @@ export function getNextCron(cronString: string, datetime = new Date()) {
   return dt
 }
 
-// TODO: optimize
 function parseCronItem(cronString: string, min: number, max: number): number[] {
   const cron = cronString.split(',')
   const ok = new Set<number>()
   const error = new ValidationError(`Can't parse CRON string: ${cronString}`)
-  for (let item of cron) {
-    item = item.trim()
+  for (let index = 0; index < cron.length; index++) {
+    const item = cron[index]!.trim()
     // If everything add every possible value and skip others
     if (item === '*') {
       for (let index = min; index <= max; index++) ok.add(index)
@@ -142,7 +140,7 @@ function parseCronItem(cronString: string, min: number, max: number): number[] {
     // If stepped
     let split = item.split('/')
     if (split.length === 2) {
-      const step = Number.parseInt(split[1]!)
+      const step = +split[1]!
       if (Number.isNaN(step)) throw error
       const items = parseCronItem(split[0]!, min, max)
       for (let index = 0; index < items.length; index += step)
@@ -152,15 +150,15 @@ function parseCronItem(cronString: string, min: number, max: number): number[] {
     // If range
     split = item.split('-')
     if (split.length === 2) {
-      const a = Number.parseInt(split[0]!)
-      const b = Number.parseInt(split[1]!)
+      const a = +split[0]!
+      const b = +split[1]!
       if (Number.isNaN(a) || Number.isNaN(b) || a < min || a > b || b > max)
         throw error
       for (let index = a; index <= b; index++) ok.add(index)
       continue
     }
     // If everything else failed check for simple number
-    const n = Number.parseInt(item)
+    const n = +item
     if (Number.isNaN(n) || n < min || n > max) throw error
     ok.add(n)
   }

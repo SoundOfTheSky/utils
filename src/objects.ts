@@ -61,7 +61,7 @@ export function addPrefixToObject<
  * - Promises
  * - etc
  *
- * Behavior with object above are not defined, but
+ * Behavior with types above are not defined, but
  * it will still check them by reference.
  */
 export function deepEquals(

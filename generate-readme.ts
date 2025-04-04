@@ -4,10 +4,27 @@ rmSync('dist/tests', {
   recursive: true,
   force: true
 })
-let readme = `# Sky utils
+
+const DEFINITION_COLOR = {
+  'function': 'CornflowerBlue',
+  'function*': 'CornflowerBlue',
+  'async function': 'CornflowerBlue',
+  'const': 'ForestGreen',
+  'type': 'Magenta',
+  'enum': 'Magenta',
+  'interface': 'Magenta',
+  'class': 'Orange'
+}
+
+let readme = `<div align="center">
+
+# Sky utils
 **JavaScript/TypeScript utilities**
 
-Utils library. 
+[![Latest Stable Version](https://img.shields.io/npm/v/@softsky/utils.svg)](https://www.npmjs.com/package/@softsky/utils)
+[![NPM Downloads](https://img.shields.io/npm/dm/@softsky/utils.svg)](https://www.npmjs.com/package/@softsky/utils)
+[![NPM Downloads](https://img.shields.io/npm/dt/@softsky/utils.svg)](https://www.npmjs.com/package/@softsky/utils)
+[![Bundlephobia Size](https://img.shields.io/bundlephobia/minzip/@softsky/utils.svg)](https://www.npmjs.com/package/@softsky/utils)
 
 \`npm i @softsky/utils\`
 
@@ -15,6 +32,7 @@ Usual utils plus more obscure stuff that I've never seen in any library.
 Also fancy TypeScript generics and types that I often use.
 
 Test coverage __100%__.
+</div>
 
 # Contribute
 I don't know why would you want to, but here's how to:
@@ -49,12 +67,13 @@ function extractCommentText(text: string) {
 }
 for (const file of files) {
   const content = readFileSync(`./src${file}.ts`, 'utf8');
-  readme += `\n\n## ${file.slice(1, 2).toUpperCase()}${file.slice(2)}\n${extractCommentText(/\/\*\*([^/]+?)\*\//s.exec(content)![1]!)}`;
+  readme += `\n\n## ${file.slice(1, 2).toUpperCase()}${file.slice(2)}\n${extractCommentText(/\/\*\*([^/]+?)\*\//s.exec(content)![1]!)}\n\n`;
   for (const match of content.matchAll(
-    /\/\*\*([^/]+?)\*\/\n(\/\/[^\n]+?\n)*export ((const|function|async function|function*|type|class) \w+)/gs,
+    /\/\*\*(((?!\/\*\*)[\S\s])+?)\*\/\n(\/\/[^\n]+?\n)*export ((const|function|async function|function*|type|class|enum|interface) \w+)/gs,
   )) {
-    const split = match[3].split(' ');
-    readme += `\n### ${split.slice(0,-1).join(' ')} _${split.at(-1)}_\n${extractCommentText(match[1]!)}`;
+    const split = match[4].split(' ');
+    const definition = split.slice(0,-1).join(' ');
+    readme+=`\${\\textsf{\\color{${DEFINITION_COLOR[definition]}}${definition}}}$ ${split.at(-1)} - ${extractCommentText(match[1]!)}\n\n---\n`
   }
 }
 writeFileSync('./README.md', readme, 'utf8');

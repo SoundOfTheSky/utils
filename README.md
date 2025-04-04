@@ -1,7 +1,12 @@
+<div align="center">
+
 # Sky utils
 **JavaScript/TypeScript utilities**
 
-Utils library. 
+[![Latest Stable Version](https://img.shields.io/npm/v/@softsky/utils.svg)](https://www.npmjs.com/package/@softsky/utils)
+[![NPM Downloads](https://img.shields.io/npm/dm/@softsky/utils.svg)](https://www.npmjs.com/package/@softsky/utils)
+[![NPM Downloads](https://img.shields.io/npm/dt/@softsky/utils.svg)](https://www.npmjs.com/package/@softsky/utils)
+[![Bundlephobia Size](https://img.shields.io/bundlephobia/minzip/@softsky/utils.svg)](https://www.npmjs.com/package/@softsky/utils)
 
 `npm i @softsky/utils`
 
@@ -9,6 +14,7 @@ Usual utils plus more obscure stuff that I've never seen in any library.
 Also fancy TypeScript generics and types that I often use.
 
 Test coverage __100%__.
+</div>
 
 # Contribute
 I don't know why would you want to, but here's how to:
@@ -29,118 +35,193 @@ export function newStuff() {}
 
 ## Arrays
 Everything array related.
-### function _randomFromArray_
-Returns random element from non-empty array
-### function _shuffleArray_
-Create new shuffled array
-### function _swap_
-Swap two elements in array
-### function _binarySearch_
-Binary search in sorted array.
+
+${\textsf{\color{CornflowerBlue}function}}$ randomFromArray - Returns random element from non-empty array
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ shuffleArray - Create new shuffled array
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ swap - Swap two elements in array
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ binarySearch - Binary search in sorted array.
 Compare function should compare your needed value with value on index passed to it.
 If compare returns 0 it means we found target.
 If compare returns > 0 it means we have to cut out bigger side of array.
 If compare returns < 0 it means we have to cut out smaller side of array.
-### function _chunk_
-Split array into sub arrays of spicified size
-### function _combinations_
-Return all combinations of items in array
-### function _permutations_
-Return all permutations of items in array
-### function _pushToSorted_
-Push data in array so array is always kept sorted
 
-@param array Target array
-@param element Element to push
-@param compare Function to find place to push.
-Return true when found position to push in.
+---
+${\textsf{\color{CornflowerBlue}function}}$ chunk - Split array into sub arrays of spicified size
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ combinations - Return all combinations of items in array
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ permutations - Return all permutations of items in array
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ pushToSorted - Push data in array so array is always kept sorted
+
+Compare must return true when found position to push in.
 For example if we return `[false, false, true, false]`,
 Array will become `[false, false, Element, true, false]`.
+
+---
+
 
 ## Consts
 Some useful consts. That's it.
 
+${\textsf{\color{ForestGreen}const}}$ DAY_MS - Milliseconds in a full day
+
+---
+${\textsf{\color{ForestGreen}const}}$ HOUR_MS - Milliseconds in a hour
+
+---
+${\textsf{\color{ForestGreen}const}}$ MIN_MS - Milliseconds in a minute
+
+---
+${\textsf{\color{ForestGreen}const}}$ SEC_MS - Milliseconds in a second
+
+---
+
+
 ## Control
 Utils related to code execution flow.
-### const _UUID_
-Get unique id
-### async function _retry_
-Retry async function
-### function _createDebouncedFunction_
-Create debounced function. Basically adds cooldown to function. Warning: throws!
-### function _createThrottledFunction_
-Create throttled function. Basically limits function calls in time period. Warning: throws!
-### function _createDelayedFunction_
-Create debounced function. Basically create function that will be called with delay,
+
+${\textsf{\color{ForestGreen}const}}$ UUID - Get unique id
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ createCashedFunction - Creates cached function. All arguments/results are cached.
+Returns [
+fn [cached function],
+delete [delete cached result for arguments]
+hash
+]
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ createCashedAsyncFunction - Creates cached function. All arguments/results are cached. Will store in cache resolved data.
+Returns [
+fn [cached function],
+delete [delete cached result for arguments]
+hash
+]
+
+---
+${\textsf{\color{CornflowerBlue}async function}}$ retry - Retry async function
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ createDebouncedFunction - Create debounced function. Basically adds cooldown to function. Warning: throws!
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ createThrottledFunction - Create throttled function. Basically limits function calls in time period. Warning: throws!
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ createDelayedFunction - Create debounced function. Basically create function that will be called with delay,
 but if another call comes in, we reset the timer.
-### class _ImmediatePromise_
-Promise that accepts no callback, but exposes `resolve` and `reject` methods
-### const _wait_
-setTimeout promisify
-### const _noop_
-Empty function that does nothing
-### async function _concurrentRun_
-Run array of async tasks concurrently
+
+---
+${\textsf{\color{Orange}class}}$ ImmediatePromise - Promise that accepts no callback, but exposes `resolve` and `reject` methods
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ wait - setTimeout promisify
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ noop - Empty function that does nothing
+
+---
+${\textsf{\color{CornflowerBlue}async function}}$ concurrentRun - Run array of async tasks concurrently
+
+---
+
 
 ## Errors
 Custom errors, finding errors and error handling.
-### class _ValidationError_
-Use as intended error. Basically 4** errors in HTTP
-### function _findErrorText_
-Find error inside anything recursively.
+
+${\textsf{\color{Orange}class}}$ ValidationError - Use as intended error. Basically 4** errors in HTTP
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ findErrorText - Find error inside anything recursively.
 Good for finding human-readable errors.
 Tries priority keys first.
 Parses JSON automatically.
 Returns undefind if nothing found.
 
+---
+
+
 ## Formatting
 Anything related to formatting and logging.
-### type _FormatTimeRange_
-Type for formatTime ranges
-### const _FORMAT_NUMBER_RANGES_
-Default time range
-### const _FORMAT_NUMBER_RANGES_READABLE_
-Time range more suitable for readability
-### const _FORMAT_NUMBER_RANGES_BYTES_
-Bytes range
-### function _formatNumber_
-Milliseconds to human readable time. Minimum accuracy, if set to 1000 will stop at seconds
-### const _camelToSnakeCase_
-thisCase to this_case
-### const _snakeToCamelCase_
-this_case to thisCase
-### function _formatBytes_
-Bytes to KB,MB,GB,TB
-### function _log_
-Format logging
-### function _capitalizeFirstLetter_
-Capitalize first letter
+
+${\textsf{\color{Magenta}type}}$ FormatTimeRange - Type for formatTime ranges
+
+---
+${\textsf{\color{ForestGreen}const}}$ FORMAT_NUMBER_RANGES - Default time range
+
+---
+${\textsf{\color{ForestGreen}const}}$ FORMAT_NUMBER_RANGES_READABLE - Time range more suitable for readability
+
+---
+${\textsf{\color{ForestGreen}const}}$ FORMAT_NUMBER_RANGES_BYTES - Bytes range
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ formatNumber - Milliseconds to human readable time. Minimum accuracy, if set to 1000 will stop at seconds
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ camelToSnakeCase - thisCase to this_case
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ snakeToCamelCase - this_case to thisCase
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ formatBytes - Bytes to KB,MB,GB,TB
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ log - Format logging
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ capitalizeFirstLetter - Capitalize first letter
+
+---
+
 
 ## Numbers
 Numbers, math, etc.
-### function _random_
-Random number between min and max. May enable float
-### function _parseInt_
-Same as parseInt but throws
-### function _parseFloat_
-Same as parseFloat but throws
-### function _factorial_
-Factorial
-### function _fib_
-Fibonacci
+
+${\textsf{\color{CornflowerBlue}function}}$ random - Random number between min and max. May enable float
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ parseInt - Same as Number.parseInt but throws if NaN or not safe
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ parseFloat - Same as Number.parseFloat but throws if NaN or Infinity
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ factorial - Factorial
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ fib - Fibonacci
+
+---
+
 
 ## Objects
 [object Object]
-### function _getPropertyNames_
-Get all prorerty names, including in prototype
-### function _objectMap_
-Map function like for arrays, but for objects
-### function _objectFilter_
-Filter function like for arrays, but for objects
-### function _addPrefixToObject_
-Adds prefix to every key in object
-### function _deepEquals_
-Check if objects are deep equal
+
+${\textsf{\color{CornflowerBlue}function}}$ getPropertyNames - Get all prorerty names, including in prototype
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ objectMap - Map function like for arrays, but for objects
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ objectFilter - Filter function like for arrays, but for objects
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ addPrefixToObject - Adds prefix to every key in object
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ deepEquals - Check if objects are deep equal
 
 **Supports:**
 - All primitives (String, Number, BigNumber, Null, undefined, Symbol)
@@ -154,47 +235,84 @@ Check if objects are deep equal
 - Promises
 - etc
 
-Behavior with object above are not defined, but
+Behavior with types above are not defined, but
 it will still check them by reference.
-### function _pick_
-Pick keys from object
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ pick - Pick keys from object
+
+---
+
 
 ## Time
 Timers, CRON, etc.
-### function _measurePerformance_
-Measure performance of a function
-### function _cronInterval_
-Like setInterval but with cron.
+
+${\textsf{\color{CornflowerBlue}function}}$ measurePerformance - Measure performance of a function
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ cronInterval - Like setInterval but with cron.
 Returns clear function.
 For cron string syntax check __getNextCron()__ description
-### class _SpeedCalculator_
-Object that calculates speed, ETA and percent of any measurable task.
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ getNextCron - Find next cron date after passed date.
+
+This function __DOES NOT__ implement regular CRON 1 to 1.
+
+Main differences:
+- Weekdays value only 0 to 6 (0 is Sunday)
+- New supported syntax: __30-60/10__ - means __30,40,50,60__
+- Second and millisecond support: __* * * * * 30 999__ - executes every 30 seconds at the end of a second
+
+---
+${\textsf{\color{Orange}class}}$ SpeedCalculator - Object that calculates speed, ETA and percent of any measurable task.
 
 `push()` chunks into speed calculator and then read `stats` for results.
 `size` - a target then task is finished. Without it only speed is calculated.
 `historyTime` - is a time period based on which speed will be calculated.
 
+---
+
+
 ## Types
 Damn, I **love** TypeScript.
-### type _Optional_
-Make keys in object optional
-### type _RequiredKey_
-Make keys in object required
-### type _Constructor_
-Get contructor type of an instance
-### type _AwaitedObject_
-Recursively resolves promises in objects and arrays
-### type _JSONSerializable_
-Anything that can be serialized to JSON
-### type _ObjectAddPrefix_
-Adds prefix to all keys in object
-### type _CamelToSnakeCase_
-Convert type of thisCase to this_case
-### type _ObjectCamelToSnakeCase_
-Convert object keys of thisCase to this_case
-### type _SnakeToCamel_
-Convert type of this-case to thisCase
-### type _ObjectSnakeToCamel_
-Convert object keys of this-case to thisCase
-### type _Concat_
-Concat types of array or objects
+
+${\textsf{\color{Magenta}type}}$ Primitive - Values that are copied by value, not by reference
+
+---
+${\textsf{\color{Magenta}type}}$ Falsy - Values that convert to false
+
+---
+${\textsf{\color{Magenta}type}}$ Optional - Make keys in object optional
+
+---
+${\textsf{\color{Magenta}type}}$ RequiredKey - Make keys in object required
+
+---
+${\textsf{\color{Magenta}type}}$ Constructor - Get contructor type of an instance
+
+---
+${\textsf{\color{Magenta}type}}$ AwaitedObject - Recursively resolves promises in objects and arrays
+
+---
+${\textsf{\color{Magenta}type}}$ JSONSerializable - Anything that can be serialized to JSON
+
+---
+${\textsf{\color{Magenta}type}}$ ObjectAddPrefix - Adds prefix to all keys in object
+
+---
+${\textsf{\color{Magenta}type}}$ CamelToSnakeCase - Convert type of thisCase to this_case
+
+---
+${\textsf{\color{Magenta}type}}$ ObjectCamelToSnakeCase - Convert object keys of thisCase to this_case
+
+---
+${\textsf{\color{Magenta}type}}$ SnakeToCamel - Convert type of this-case to thisCase
+
+---
+${\textsf{\color{Magenta}type}}$ ObjectSnakeToCamel - Convert object keys of this-case to thisCase
+
+---
+${\textsf{\color{Magenta}type}}$ Concat - Concat types of array or objects
+
+---

@@ -1,6 +1,6 @@
 {
   "name": "@softsky/utils",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "JavaScript/TypeScript utilities",
   "main": "dist/index.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "url": "git+https://github.com/SoundOfTheSky/utils.git"
   },
   "author": "SoundOfTheSky",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/SoundOfTheSky/utils/issues"
   },

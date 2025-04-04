@@ -9,7 +9,7 @@ export function random(min: number, max: number, float?: boolean): number {
   return float ? number_ : Math.round(number_)
 }
 
-/** Same as parseInt but throws */
+/** Same as Number.parseInt but throws if NaN or not safe */
 export function parseInt(parameter: unknown, radix?: number) {
   const n = Number.parseInt(parameter as string, radix)
 
@@ -19,7 +19,7 @@ export function parseInt(parameter: unknown, radix?: number) {
   return n
 }
 
-/** Same as parseFloat but throws */
+/** Same as Number.parseFloat but throws if NaN or Infinity */
 export function parseFloat(parameter: unknown) {
   const n = Number.parseFloat(parameter as string)
 

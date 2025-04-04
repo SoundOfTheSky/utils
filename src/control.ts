@@ -181,11 +181,13 @@ export default async function deepPromiseAll<T>(
 }
 
 /** setTimeout promisify */
-export const wait = (time: number) => new Promise((r) => setTimeout(r, time))
+export function wait(time: number) {
+  return new Promise((r) => setTimeout(r, time))
+}
 
 /** Empty function that does nothing */
 // eslint-disable-next-line @typescript-eslint/no-empty-function
-export const noop = () => {}
+export function noop() {}
 
 /** Run array of async tasks concurrently */
 export async function concurrentRun<T>(
