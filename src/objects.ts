@@ -2,7 +2,7 @@
  * [object Object]
  */
 
-import { ObjectAddPrefix } from './types'
+import { Constructor, ObjectAddPrefix } from './types'
 
 /** Get all prorerty names, including in prototype */
 export function getPropertyNames(object: object, keys = new Set()) {
@@ -145,4 +145,28 @@ export function pick<T extends object, K extends keyof T>(
     newObject[key] = object[key]
   }
   return newObject as Pick<T, K>
+}
+
+/**
+ * Base class that helps to manage ids and subclasses.
+ *
+ * Include next lines when extending this class:
+ * ```js
+ * static {
+ *   this.registerSubclass()
+ * }
+ * ```
+ */
+export class Base {
+  public static lastId = 0
+  public static idMap = new Map<number, Base>()
+  public static subclasses = new Map<string, Constructor<Base>>()
+
+  public constructor(public id = ++Base.lastId) {
+    Base.idMap.set(id, this)
+  }
+
+  public static registerSubclass() {
+    Base.subclasses.set(this.name, this)
+  }
 }

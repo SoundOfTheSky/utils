@@ -242,6 +242,16 @@ it will still check them by reference.
 ${\textsf{\color{CornflowerBlue}function}}$ pick - Pick keys from object
 
 ---
+${\textsf{\color{Orange}class}}$ Base - Base class that helps to manage ids and subclasses.
+
+Include next lines when extending this class:
+```js
+static {
+this.registerSubclass()
+}
+```
+
+---
 
 
 ## Time

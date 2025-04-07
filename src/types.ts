@@ -24,7 +24,7 @@ export type RequiredKey<T, K extends keyof T> = Omit<T, K & keyof T> &
   Required<Pick<T, K & keyof T>>
 
 /** Get contructor type of an instance */
-export type Constructor<T> = abstract new (..._arguments: any[]) => T
+export type Constructor<T> = new (..._arguments: any[]) => T
 
 /** Recursively resolves promises in objects and arrays */
 export type AwaitedObject<T> =

@@ -1,8 +1,9 @@
 // eslint-disable-next-line import-x/no-unresolved
-import { describe, expect, it } from 'bun:test'
+import { beforeEach, describe, expect, it } from 'bun:test'
 
 import {
   addPrefixToObject,
+  Base,
   deepEquals,
   getPropertyNames,
   objectFilter,
@@ -152,5 +153,53 @@ describe('pick', () => {
   it('should pick only the selected keys', () => {
     const object = { a: 1, b: 2, c: 3 }
     expect(pick(object, ['a', 'c'])).toEqual({ a: 1, c: 3 })
+  })
+})
+
+describe('Base class', () => {
+  beforeEach(() => {
+    // Reset state before each test
+    Base.lastId = 0
+    Base.idMap.clear()
+    Base.subclasses.clear()
+  })
+
+  it('should assign incremental IDs', () => {
+    const a = new Base()
+    const b = new Base()
+    expect(a.id).toBe(1)
+    expect(b.id).toBe(2)
+  })
+
+  it('should map instances by ID', () => {
+    const a = new Base()
+    expect(Base.idMap.get(a.id)).toBe(a)
+  })
+
+  it('should register subclasses with correct names', () => {
+    class A extends Base {
+      static {
+        this.registerSubclass()
+      }
+    }
+    class B extends Base {
+      static {
+        this.registerSubclass()
+      }
+    }
+    expect(Base.subclasses.get('A')).toBe(A)
+    expect(Base.subclasses.get('B')).toBe(B)
+  })
+
+  it('should allow creating subclass instances via map', () => {
+    class A extends Base {
+      static {
+        this.registerSubclass()
+      }
+    }
+    const Ctor = Base.subclasses.get('A')
+    const inst = Ctor && new Ctor()
+    expect(inst).toBeInstanceOf(A)
+    expect(inst?.id).toBeGreaterThan(0)
   })
 })
