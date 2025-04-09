@@ -12,6 +12,9 @@ export type Primitive =
   | null
   | undefined
 
+/** Function with any arguments or return type */
+export type AnyFunction = (...arguments_: any[]) => any
+
 /** Values that convert to false */
 export type Falsy = false | '' | 0 | null | undefined
 

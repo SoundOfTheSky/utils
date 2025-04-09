@@ -133,23 +133,27 @@ export function createDelayedFunction<T, V extends unknown[]>(
   }
 }
 
+type ResolveFunction<T> = undefined extends T
+  ? (value?: T | PromiseLike<T>) => void
+  : (value: T | PromiseLike<T>) => void
 /** Promise that accepts no callback, but exposes `resolve` and `reject` methods */
 export class ImmediatePromise<T> extends Promise<T> {
-  public resolve!: (value: T | PromiseLike<T>) => void
+  public resolve!: ResolveFunction<T>
   public reject!: (reason?: unknown) => void
 
   public constructor(
     execute?: (
-      resolve: (value: T | PromiseLike<T>) => void,
+      resolve: ResolveFunction<T>,
       reject: (reason?: any) => void,
     ) => void,
   ) {
-    if (execute) super(execute)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    if (execute) super(execute as any)
     else {
-      let _resolve: (value: T | PromiseLike<T>) => void = noop
+      let _resolve: ResolveFunction<T> = noop
       let _reject: (reason?: unknown) => void = noop
       super((resolve, reject) => {
-        _resolve = resolve
+        _resolve = resolve as ResolveFunction<T>
         _reject = reject
       })
       this.resolve = _resolve

@@ -254,6 +254,99 @@ this.registerSubclass()
 ---
 
 
+## Signals
+Reactive signals
+
+${\textsf{\color{CornflowerBlue}function}}$ signal - __SIGNALS SYSTEM__
+
+Signal can hold any data (except functions),
+when this data has changed any effects containing
+this signal will be rerun.
+
+```ts
+const $mySignal = signal<number|undefined>(1) // Create signal with initial value 1
+$mySignal(5) // Set to 5
+$mySignal(undefined) // Set to undefined
+$mySignal(prev=>prev+1) // Increment
+// Will print signal on change
+effect(()=>{
+console.log($mySignal())
+})
+```
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ effect - __SIGNALS SYSTEM__
+
+Effects are simplest way to react to signal changes.
+Returned data from handler function will be passed to it on next signal change.
+Returns a function that will clear the effect.
+
+```ts
+// Will print signal on change
+effect(()=>{
+console.log($mySignal())
+})
+// Use previous state as a reference
+effect((last)=>{
+const mySignal = $mySignal()
+if(last>mySignal) console.log('Increment!')
+return mySignal;
+})
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ untrack - __SIGNALS SYSTEM__
+
+Untrack helps to not react to changes in effects.
+```ts
+const $a = signal(1)
+const $b = signal(2)
+// Will only run on changes to $b
+effect(()=>{
+console.log(untrack($a)+$b())
+})
+```
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ derived - __SIGNALS SYSTEM__
+
+Creates a derived reactive memoized signal.
+
+```ts
+// Sum of all changes of $a()
+const { signal: $sumOfTwo, clear: clearSum } = derived((value) => value + $a(), 0)
+```
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ batch - __SIGNALS SYSTEM__
+
+Batches multiple edits, so they don't call same effects multiple times
+
+```ts
+const $a = signal(1)
+const $b = signal(2)
+effect(()=>{
+console.log($a()+$b())
+})
+$a(2); // Prints 4
+$b(3); // Prints 5
+// Prints only 10
+batch(()=>{
+$a(5);
+$b(5);
+})
+```
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ when - __SIGNALS SYSTEM__
+
+Returns promise that is resolved when check function returns truthy value
+```ts
+await when(()=>$a()>5)
+```
+
+---
+
+
 ## Time
 Timers, CRON, etc.
 
@@ -288,6 +381,9 @@ ${\textsf{\color{Orange}class}}$ SpeedCalculator - Object that calculates speed,
 Damn, I **love** TypeScript.
 
 ${\textsf{\color{Magenta}type}}$ Primitive - Values that are copied by value, not by reference
+
+---
+${\textsf{\color{Magenta}type}}$ AnyFunction - Function with any arguments or return type
 
 ---
 ${\textsf{\color{Magenta}type}}$ Falsy - Values that convert to false
