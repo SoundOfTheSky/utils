@@ -130,3 +130,96 @@ export function log(...agrs: unknown[]) {
 export function capitalizeFirstLetter(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1)
 }
+
+/**
+ * pipe() can be called on one or more functions, each of which can take the return of previous value.
+ *
+ * ```ts
+ * // Takes string, converts to int, calc sqrt, convert and return date
+ * pipe(
+ *  (x: string) => Number.parseInt(x),
+ *  (x) => Math.sqrt(x),
+ *  (x) => new Date(x)
+ * )('69')
+ * ```
+ */
+export function pipe(): <T>(x: T) => T
+export function pipe<T, A>(function1: (x: T) => A): (x: T) => A
+export function pipe<T, A, B>(
+  function1: (x: T) => A,
+  function2: (x: A) => B,
+): (x: T) => B
+export function pipe<T, A, B, C>(
+  function1: (x: T) => A,
+  function2: (x: A) => B,
+  function3: (x: B) => C,
+): (x: T) => C
+export function pipe<T, A, B, C, D>(
+  function1: (x: T) => A,
+  function2: (x: A) => B,
+  function3: (x: B) => C,
+  function4: (x: C) => D,
+): (x: T) => D
+export function pipe<T, A, B, C, D, E>(
+  function1: (x: T) => A,
+  function2: (x: A) => B,
+  function3: (x: B) => C,
+  function4: (x: C) => D,
+  function5: (x: D) => E,
+): (x: T) => E
+export function pipe<T, A, B, C, D, E, F>(
+  function1: (x: T) => A,
+  function2: (x: A) => B,
+  function3: (x: B) => C,
+  function4: (x: C) => D,
+  function5: (x: D) => E,
+  function6: (x: E) => F,
+): (x: T) => F
+export function pipe<T, A, B, C, D, E, F, G>(
+  function1: (x: T) => A,
+  function2: (x: A) => B,
+  function3: (x: B) => C,
+  function4: (x: C) => D,
+  function5: (x: D) => E,
+  function6: (x: E) => F,
+  function7: (x: F) => G,
+): (x: T) => G
+export function pipe<T, A, B, C, D, E, F, G, H>(
+  function1: (x: T) => A,
+  function2: (x: A) => B,
+  function3: (x: B) => C,
+  function4: (x: C) => D,
+  function5: (x: D) => E,
+  function6: (x: E) => F,
+  function7: (x: F) => G,
+  function8: (x: G) => H,
+): (x: T) => H
+export function pipe<T, A, B, C, D, E, F, G, H, I>(
+  function1: (x: T) => A,
+  function2: (x: A) => B,
+  function3: (x: B) => C,
+  function4: (x: C) => D,
+  function5: (x: D) => E,
+  function6: (x: E) => F,
+  function7: (x: F) => G,
+  function8: (x: G) => H,
+  function9: (x: H) => I,
+): (x: T) => I
+export function pipe<T, A, B, C, D, E, F, G, H>(
+  function1: (x: T) => A,
+  function2: (x: A) => B,
+  function3: (x: B) => C,
+  function4: (x: C) => D,
+  function5: (x: D) => E,
+  function6: (x: E) => F,
+  function7: (x: F) => G,
+  function8: (x: G) => H,
+  function9: (x: H) => unknown,
+  ...fns: ((x: unknown) => unknown)[]
+): (x: T) => unknown
+export function pipe(...fns: ((argument: unknown) => unknown)[]) {
+  return (input: unknown) => {
+    for (let index = 0; index < fns.length; index++) input = fns[index]!(input)
+    return input
+  }
+}

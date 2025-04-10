@@ -7,6 +7,7 @@ import {
   formatBytes,
   formatNumber,
   log,
+  pipe,
   snakeToCamelCase,
 } from '../formatting'
 
@@ -50,5 +51,30 @@ describe('capitalizeFirstLetter', () => {
   it('capitalizes the first letter of a string', () => {
     expect(capitalizeFirstLetter('hello')).toBe('Hello')
     expect(capitalizeFirstLetter('world')).toBe('World')
+  })
+})
+
+describe('pipe', () => {
+  it('should compose functions correctly', () => {
+    const result = pipe(
+      (x: number) => x + 1,
+      (x) => x * 2,
+      (x) => `Result: ${x}`,
+    )
+    expect(result(3)).toBe('Result: 8')
+  })
+
+  it('should infer types across chained functions', () => {
+    const process = pipe(
+      (x: string) => Number.parseFloat(x),
+      (x) => x.toFixed(2),
+      (x) => `Value: ${x}`,
+    )
+    expect(process('3.14159')).toBe('Value: 3.14')
+  })
+
+  it('should handle single function', () => {
+    const echo = pipe((x: string) => x + '!')
+    expect(echo('hello')).toBe('hello!')
   })
 })

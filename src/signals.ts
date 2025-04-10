@@ -6,7 +6,7 @@ import { ImmediatePromise } from './control'
 import { AnyFunction } from './types'
 
 let currentEffect: AnyFunction | undefined
-const effectsMap = new WeakMap<AnyFunction, Set<AnyFunction>>()
+const effectsMap = new WeakMap<AnyFunction, Set<Set<AnyFunction>>>()
 let batchedEffects: Set<AnyFunction> | undefined
 
 export type Signal<T> = (setTo?: T | ((previous: T) => T)) => T
@@ -44,11 +44,24 @@ export function signal<T>(value?: T): Signal<T | undefined> {
         for (const subscriber of subscribers) batchedEffects.add(subscriber)
       else for (const subscriber of subscribers) subscriber()
     } else if (currentEffect) {
-      effectsMap.set(currentEffect, subscribers)
       subscribers.add(currentEffect)
+
+      // This is for clear() of effects
+      let effectSubscribers = effectsMap.get(currentEffect)
+      if (!effectSubscribers) {
+        effectSubscribers = new Set()
+        effectsMap.set(currentEffect, effectSubscribers)
+      }
+      effectSubscribers.add(subscribers)
     }
     return value
   }
+}
+
+function clearEffect(handler: AnyFunction) {
+  const signalSubscribers = effectsMap.get(handler)
+  if (signalSubscribers)
+    for (const subscribers of signalSubscribers) subscribers.delete(handler)
 }
 
 /**
@@ -82,7 +95,7 @@ export function effect<T>(
   wrappedHandler()
   currentEffect = undefined
   return () => {
-    effectsMap.get(wrappedHandler)?.delete(wrappedHandler)
+    clearEffect(wrappedHandler)
   }
 }
 
@@ -143,7 +156,7 @@ export function derived<T>(
   return {
     signal: signal$,
     clear: () => {
-      effectsMap.get(wrappedHandler)?.delete(wrappedHandler)
+      clearEffect(wrappedHandler)
     },
   }
 }
@@ -178,19 +191,24 @@ export function batch(handler: AnyFunction) {
 /**
  * __SIGNALS SYSTEM__
  *
- * Returns promise that is resolved when check function returns truthy value
+ * Returns ImmediatePromise that is resolved when check function returns truthy value.
+ * If you want to, you can resolve or reject promise beforehand.
+ *
  * ```ts
- * await when(()=>$a()>5)
+ * await when(() => $a()>5)
+ * // With timeout
+ * const promise = when(() => $a() > 5)
+ * const timeout = setTimeout(() => promise.reject('Timeout')}, 5000)
+ * primise.then(() => clearTimeout(timeout))
  * ```
  */
 export function when(check: () => unknown) {
   const promise = new ImmediatePromise<undefined>()
   const clear = effect(() => {
-    if (check())
-      setTimeout(() => {
-        clear()
-        promise.resolve()
-      })
+    if (check()) promise.resolve()
+  })
+  void promise.finally(() => {
+    clear()
   })
   return promise
 }

@@ -184,6 +184,18 @@ ${\textsf{\color{CornflowerBlue}function}}$ log - Format logging
 ${\textsf{\color{CornflowerBlue}function}}$ capitalizeFirstLetter - Capitalize first letter
 
 ---
+${\textsf{\color{CornflowerBlue}function}}$ pipe - pipe() can be called on one or more functions, each of which can take the return of previous value.
+
+```ts
+// Takes string, converts to int, calc sqrt, convert and return date
+pipe(
+(x: string) => Number.parseInt(x),
+(x) => Math.sqrt(x),
+(x) => new Date(x)
+)('69')
+```
+
+---
 
 
 ## Numbers
@@ -339,9 +351,15 @@ $b(5);
 ---
 ${\textsf{\color{CornflowerBlue}function}}$ when - __SIGNALS SYSTEM__
 
-Returns promise that is resolved when check function returns truthy value
+Returns ImmediatePromise that is resolved when check function returns truthy value.
+If you want to, you can resolve or reject promise beforehand.
+
 ```ts
-await when(()=>$a()>5)
+await when(() => $a()>5)
+// With timeout
+const promise = when(() => $a() > 5)
+const timeout = setTimeout(() => promise.reject('Timeout')}, 5000)
+primise.then(() => clearTimeout(timeout))
 ```
 
 ---
