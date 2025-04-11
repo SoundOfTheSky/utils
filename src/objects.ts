@@ -162,7 +162,18 @@ export class Base {
   public static idMap = new Map<number, Base>()
   public static subclasses = new Map<string, Constructor<Base>>()
 
-  public constructor(public id = ++Base.lastId) {
+  private _id: number
+  public get id() {
+    return this._id
+  }
+  public set id(value) {
+    Base.idMap.delete(this._id)
+    Base.idMap.set(value, this)
+    this._id = value
+  }
+
+  public constructor(id = ++Base.lastId) {
+    this._id = id
     Base.idMap.set(id, this)
   }
 

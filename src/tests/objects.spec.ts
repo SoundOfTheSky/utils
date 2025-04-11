@@ -202,4 +202,17 @@ describe('Base class', () => {
     expect(inst).toBeInstanceOf(A)
     expect(inst?.id).toBeGreaterThan(0)
   })
+  it('should update ids', () => {
+    class A extends Base {
+      static {
+        this.registerSubclass()
+      }
+    }
+    const a = new A()
+    const id = a.id
+    expect(A.idMap.get(id) as A).toBe(a)
+    a.id = 100
+    expect(A.idMap.get(id) as A).toBeUndefined()
+    expect(A.idMap.get(a.id) as A).toBe(a)
+  })
 })
