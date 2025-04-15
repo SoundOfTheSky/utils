@@ -1,12 +1,12 @@
 {
   "name": "@softsky/utils",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "JavaScript/TypeScript utilities",
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint \"./src/**/*.ts\" --fix && tsc",
     "gen-readme": "bun ./generate-readme.ts",
-    "prepublishOnly": "bun run test && bun run lint && bun run gen-readme",
+    "prepublishOnly": "npm i && bun run test && bun run lint && bun run gen-readme",
     "test": "bun test"
   },
   "repository": {

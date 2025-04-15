@@ -8,6 +8,8 @@ import {
   permutations,
   pushToSorted,
   randomFromArray,
+  removeFromArray,
+  removeLastFromArray,
   shuffleArray,
   swap,
 } from '../arrays'
@@ -108,5 +110,23 @@ describe('pushToSorted', () => {
     const array = [1, 3, 5]
     pushToSorted(array, 10, (element) => element > 10)
     expect(array).toEqual([1, 3, 5, 10])
+  })
+})
+
+describe('removeFromArray', () => {
+  it('removeFromArray', () => {
+    const array = [1, 2, 3, 3, 2, 1]
+    expect(removeFromArray(array, 2)).toBe(1)
+    expect(array).toEqual([1, 3, 3, 2, 1])
+    expect(removeFromArray(array, 0)).toBe(-1)
+    expect(array).toEqual([1, 3, 3, 2, 1])
+  })
+
+  it('removeLastFromArray', () => {
+    const array = [1, 2, 3, 3, 2, 1]
+    expect(removeLastFromArray(array, 2)).toBe(4)
+    expect(array).toEqual([1, 2, 3, 3, 1])
+    expect(removeLastFromArray(array, Infinity)).toBe(-1)
+    expect(array).toEqual([1, 2, 3, 3, 1])
   })
 })

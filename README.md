@@ -68,6 +68,18 @@ For example if we return `[false, false, true, false]`,
 Array will become `[false, false, Element, true, false]`.
 
 ---
+${\textsf{\color{CornflowerBlue}function}}$ removeFromArray - Delete value from array.
+Only deletes first encountered.
+
+Returns index of deleted value.
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ removeLastFromArray - Delete value from array.
+Only deletes last encountered.
+
+Returns index of deleted value.
+
+---
 
 
 ## Consts

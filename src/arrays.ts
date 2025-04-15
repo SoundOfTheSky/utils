@@ -114,3 +114,27 @@ export function pushToSorted<T>(
   const index = array.findIndex(compare)
   array.splice(index === -1 ? array.length : index, 0, element)
 }
+
+/**
+ * Delete value from array.
+ * Only deletes first encountered.
+ *
+ * Returns index of deleted value.
+ */
+export function removeFromArray<T>(array: T[], value: T): number {
+  const index = array.indexOf(value)
+  if (index !== -1) array.splice(index, 1)
+  return index
+}
+
+/**
+ * Delete value from array.
+ * Only deletes last encountered.
+ *
+ * Returns index of deleted value.
+ */
+export function removeLastFromArray<T>(array: T[], value: T): number {
+  const index = array.lastIndexOf(value)
+  if (index !== -1) array.splice(index, 1)
+  return index
+}
