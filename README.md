@@ -61,11 +61,16 @@ ${\textsf{\color{CornflowerBlue}function}}$ combinations - Return all combinatio
 ${\textsf{\color{CornflowerBlue}function}}$ permutations - Return all permutations of items in array
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ pushToSorted - Push data in array so array is always kept sorted
+${\textsf{\color{CornflowerBlue}function}}$ pushToSorted - Push data to sorted array. Array will always be kept sorted.
 
-Compare must return true when found position to push in.
-For example if we return `[false, false, true, false]`,
-Array will become `[false, false, Element, true, false]`.
+Compare function should compare your needed value with value on index passed to it.
+If compare returns 0 it means we found target.
+If compare returns > 0 it means target is smaller.
+If compare returns < 0 it means target is bigger.
+
+```ts
+pushToSorted(numArray, 10,  x => x - 10);
+```
 
 ---
 ${\textsf{\color{CornflowerBlue}function}}$ removeFromArray - Delete value from array.

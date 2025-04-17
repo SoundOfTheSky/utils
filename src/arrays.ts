@@ -36,12 +36,17 @@ export function swap<T>(array: T[], index: number, index2: number) {
  * If compare returns > 0 it means we have to cut out bigger side of array.
  * If compare returns < 0 it means we have to cut out smaller side of array.
  */
-export function binarySearch(size: number, compare: (index: number) => number) {
+export function binarySearch(
+  size: number,
+  compare: (index: number) => number,
+  returnClosest?: boolean,
+) {
   let low = 0
-  let high = size - 1
+  let high = size
   let position = -1
-  while (low <= high) {
-    const mid = Math.trunc((low + high) / 2)
+  while (high >= low) {
+    const mid = ((low + high) / 2) | 0
+    if (returnClosest) position = mid
     const compared = compare(mid)
     if (compared === 0) {
       position = mid
@@ -100,19 +105,24 @@ export function permutations<T>(array: T[]): T[][] {
 }
 
 /**
- * Push data in array so array is always kept sorted
+ * Push data to sorted array. Array will always be kept sorted.
  *
- * Compare must return true when found position to push in.
- * For example if we return `[false, false, true, false]`,
- * Array will become `[false, false, Element, true, false]`.
+ * Compare function should compare your needed value with value on index passed to it.
+ * If compare returns 0 it means we found target.
+ * If compare returns > 0 it means target is smaller.
+ * If compare returns < 0 it means target is bigger.
+ *
+ * ```ts
+ * pushToSorted(numArray, 10,  x => x - 10);
+ * ```
  */
 export function pushToSorted<T>(
   array: T[],
   element: T,
-  compare: (element: T) => boolean,
+  compare: (x: T) => number,
 ) {
-  const index = array.findIndex(compare)
-  array.splice(index === -1 ? array.length : index, 0, element)
+  const index = binarySearch(array.length, (x) => compare(array[x]!), true)
+  array.splice(index, 0, element)
 }
 
 /**

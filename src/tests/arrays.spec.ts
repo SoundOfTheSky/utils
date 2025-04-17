@@ -102,14 +102,16 @@ describe('permutations', () => {
 describe('pushToSorted', () => {
   it('inserts an element while maintaining sort order', () => {
     const array = [1, 3, 5]
-    pushToSorted(array, 4, (element) => element > 4)
+    pushToSorted(array, 4, (element) => element - 4)
     expect(array).toEqual([1, 3, 4, 5])
+    pushToSorted(array, 4, (element) => element - 4)
+    expect(array).toEqual([1, 3, 4, 4, 5])
   })
 
-  it('inserts an element at the end if position not found', () => {
+  it('inserts an element if place not found', () => {
     const array = [1, 3, 5]
-    pushToSorted(array, 10, (element) => element > 10)
-    expect(array).toEqual([1, 3, 5, 10])
+    pushToSorted(array, -100, (element) => element + 100)
+    expect(array).toEqual([-100, 1, 3, 5])
   })
 })
 
