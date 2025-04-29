@@ -215,6 +215,31 @@ pipe(
 ---
 
 
+## Graphs
+Pos
+
+${\textsf{\color{CornflowerBlue}function}}$ unfoldPathfindingResult - Unfold pathfinding result to path array.
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ aStar - Pathfind using aStar.
+Returns a target and map of parents.
+You can use `unfoldPathfindingResult()` to get array of nodes.
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ bfs - Breadth-first search. Slower than dfs.
+If isTarget is omitted becomes floodfill.
+Returns a target and map of parents.
+You can use `unfoldPathfindingResult()` to get array of nodes.
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ dfs - Depth-first search. Faster than bfs.
+If isTarget is omitted becomes floodfill.
+Returns a target and map of parents.
+You can use `unfoldPathfindingResult()` to get array of nodes.
+
+---
+
+
 ## Numbers
 Numbers, math, etc.
 

@@ -113,6 +113,12 @@ describe('pushToSorted', () => {
     pushToSorted(array, -100, (element) => element + 100)
     expect(array).toEqual([-100, 1, 3, 5])
   })
+
+  it('empty array', () => {
+    const array: { data: number }[] = []
+    pushToSorted(array, { data: 10 }, (element) => element.data - 10)
+    expect(array).toEqual([{ data: 10 }])
+  })
 })
 
 describe('removeFromArray', () => {

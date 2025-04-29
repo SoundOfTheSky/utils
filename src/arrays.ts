@@ -41,20 +41,18 @@ export function binarySearch(
   compare: (index: number) => number,
   returnClosest?: boolean,
 ) {
+  if (size === 0) return returnClosest ? 0 : -1
   let low = 0
   let high = size
-  let position = -1
-  while (high >= low) {
-    const mid = ((low + high) / 2) | 0
-    if (returnClosest) position = mid
+  let mid = -1
+  while (high > low) {
+    mid = ((low + high) / 2) | 0
     const compared = compare(mid)
-    if (compared === 0) {
-      position = mid
-      break
-    } else if (compared > 0) high = mid - 1
+    if (compared === 0) return mid
+    else if (compared > 0) high = mid
     else low = mid + 1
   }
-  return position
+  return returnClosest ? mid : -1
 }
 
 /** Split array into sub arrays of spicified size */
