@@ -107,7 +107,14 @@ ${\textsf{\color{ForestGreen}const}}$ SEC_MS - Milliseconds in a second
 ## Control
 Utils related to code execution flow.
 
-${\textsf{\color{ForestGreen}const}}$ UUID - Get unique id
+${\textsf{\color{ForestGreen}const}}$ generateNumberId - Get unique number id
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ UUID - Get universally unique string id.
+You can get information then id was generated using extractUUIDDate(uuid)
+
+---
+${\textsf{\color{CornflowerBlue}function}}$ extractUUIDDate - Extract exact date of uuid generation
 
 ---
 ${\textsf{\color{CornflowerBlue}function}}$ createCashedFunction - Creates cached function. All arguments/results are cached.

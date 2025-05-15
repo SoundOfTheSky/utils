@@ -4,9 +4,27 @@
 
 import { AwaitedObject, JSONSerializable } from './types'
 
+let stringIdInc = 0
 let _uuid = Date.now() * 1000
-/** Get unique id */
-export const UUID = () => _uuid++
+/** Get unique number id */
+export const generateNumberId = () => _uuid++
+
+const SESSION_ID = ((Math.random() * 2_147_483_648) | 0).toString(16)
+
+/**
+ * Get universally unique string id.
+ * You can get information then id was generated using extractUUIDDate(uuid)
+ */
+export function UUID() {
+  if (stringIdInc === 46_655) stringIdInc = 0
+  else stringIdInc++
+  return `${Date.now().toString(36).padStart(11, '0')}${(++stringIdInc).toString(36).padStart(3, '0')}${SESSION_ID}`
+}
+
+/** Extract exact date of uuid generation */
+export function extractUUIDDate(uuid: string) {
+  return new Date(Number.parseInt(uuid.slice(0, 11), 36))
+}
 
 /**
  * Creates cached function. All arguments/results are cached.

@@ -10,16 +10,38 @@ import deepPromiseAll, {
   createDebouncedFunction,
   createDelayedFunction,
   createThrottledFunction,
+  extractUUIDDate,
+  generateNumberId,
   noop,
   retry,
   wait,
 } from '../control'
 
-describe('UUID', () => {
+describe('generateNumberId', () => {
   it('generates unique increasing IDs', () => {
-    const id1 = UUID()
-    const id2 = UUID()
+    const id1 = generateNumberId()
+    const id2 = generateNumberId()
     expect(id2).toBeGreaterThan(id1)
+  })
+})
+
+describe('UUID', () => {
+  it('generates unique IDs', () => {
+    const exists = new Set<string>()
+    for (let index = 0; index < 1_000_000; index++) {
+      const uuid = UUID()
+      if (exists.has(uuid)) break
+      exists.add(uuid)
+    }
+    expect(exists.size).toBe(1_000_000)
+  })
+  it('extracts date', async () => {
+    const now1 = Date.now()
+    const uuid1 = UUID()
+    await wait(500)
+    const uuid2 = UUID()
+    expect(extractUUIDDate(uuid1).getTime()).toBeWithin(now1 - 10, now1 + 10)
+    expect(extractUUIDDate(uuid2).getTime()).toBeWithin(now1 + 490, now1 + 510)
   })
 })
 
