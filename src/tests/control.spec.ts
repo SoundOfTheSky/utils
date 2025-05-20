@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, mock } from 'bun:test'
 
 import deepPromiseAll, {
   ImmediatePromise,
+  SimpleEventSource,
   UUID,
   concurrentRun,
   createCashedAsyncFunction,
@@ -11,26 +12,20 @@ import deepPromiseAll, {
   createDelayedFunction,
   createThrottledFunction,
   extractUUIDDate,
-  generateNumberId,
   noop,
   retry,
   wait,
 } from '../control'
-
-describe('generateNumberId', () => {
-  it('generates unique increasing IDs', () => {
-    const id1 = generateNumberId()
-    const id2 = generateNumberId()
-    expect(id2).toBeGreaterThan(id1)
-  })
-})
 
 describe('UUID', () => {
   it('generates unique IDs', () => {
     const exists = new Set<string>()
     for (let index = 0; index < 1_000_000; index++) {
       const uuid = UUID()
-      if (exists.has(uuid)) break
+      if (exists.has(uuid)) {
+        console.error(uuid)
+        continue
+      }
       exists.add(uuid)
     }
     expect(exists.size).toBe(1_000_000)
@@ -260,5 +255,62 @@ describe('concurrentRun', () => {
     })
     await concurrentRun(tasks, 2)
     expect(maxRunning).toBeLessThanOrEqual(2) // Ensure concurrency limit is respected
+  })
+})
+
+type Events = {
+  message: string
+  count: number
+}
+
+describe('SimpleEventSource', () => {
+  let source = new SimpleEventSource<Events>()
+  let h1 = mock(noop)
+  let h2 = mock(noop)
+  let h3 = mock(noop)
+  let ch1 = source.on('count', h1)
+  source.on('count', h2)
+  source.on('message', h3)
+  beforeEach(() => {
+    source = new SimpleEventSource<Events>()
+    h1 = mock(noop)
+    h2 = mock(noop)
+    h3 = mock(noop)
+    ch1 = source.on('count', h1)
+    source.on('count', h2)
+    source.on('message', h3)
+  })
+  it('should support multiple handlers for the same event', () => {
+    source.send('count', 5)
+
+    expect(h1).toHaveBeenCalledWith(5)
+    expect(h1).toHaveBeenCalledTimes(1)
+    expect(h2).toHaveBeenCalledWith(5)
+    expect(h2).toHaveBeenCalledTimes(1)
+  })
+  it('should unsubscribe on callback', () => {
+    source.send('count', 5)
+    ch1()
+    source.send('count', 10)
+    expect(h1).toHaveBeenCalledWith(5)
+    expect(h1).toHaveBeenCalledTimes(1)
+    expect(h2).toHaveBeenCalledWith(10)
+    expect(h2).toHaveBeenCalledTimes(2)
+  })
+  it('should diffirentiate events', () => {
+    source.send('message', 'a')
+    expect(h1).not.toHaveBeenCalled()
+    expect(h2).not.toHaveBeenCalled()
+    expect(h3).toHaveBeenCalledWith('a')
+    expect(h3).toHaveBeenCalledTimes(1)
+  })
+  it('should unsubscribe with off', () => {
+    source.send('count', 5)
+    source.off('count', h1)
+    source.send('count', 10)
+    expect(h1).toHaveBeenCalledWith(5)
+    expect(h1).toHaveBeenCalledTimes(1)
+    expect(h2).toHaveBeenCalledWith(10)
+    expect(h2).toHaveBeenCalledTimes(2)
   })
 })

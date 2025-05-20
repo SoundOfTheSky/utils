@@ -2,28 +2,39 @@
  * Utils related to code execution flow.
  */
 
+import { removeFromArray } from './arrays'
 import { AwaitedObject, JSONSerializable } from './types'
 
-let stringIdInc = 0
-let _uuid = Date.now() * 1000
-/** Get unique number id */
-export const generateNumberId = () => _uuid++
+let lastIncId = Math.floor(Math.random() * 0x1_00_00)
 
-const SESSION_ID = ((Math.random() * 2_147_483_648) | 0).toString(16)
+/** Id generated only once per session */
+export const SESSION_ID = Math.floor(Math.random() * 0x10_00_00_00_00_00_00)
+  .toString(16)
+  .padStart(13, '0')
 
 /**
  * Get universally unique string id.
  * You can get information then id was generated using extractUUIDDate(uuid)
+ * - 13 char - timestamp
+ * - 13 char - SESSION_ID
+ * - 4 char - incremental id
+ *
+ * 30 char total.
+ *
+ * USING CUSTOM TIMESTAMP MAY RESULT IN COLLISSIONS
  */
-export function UUID() {
-  if (stringIdInc === 46_655) stringIdInc = 0
-  else stringIdInc++
-  return `${Date.now().toString(36).padStart(11, '0')}${(++stringIdInc).toString(36).padStart(3, '0')}${SESSION_ID}`
+export function UUID(timestamp = Date.now()) {
+  let inc = (++lastIncId).toString(16).padStart(4, '0')
+  if (inc.length === 5) {
+    lastIncId = 0
+    inc = '0000'
+  }
+  return `${timestamp.toString(16).padStart(13, '0')}${inc}${SESSION_ID}`
 }
 
 /** Extract exact date of uuid generation */
 export function extractUUIDDate(uuid: string) {
-  return new Date(Number.parseInt(uuid.slice(0, 11), 36))
+  return new Date(Number.parseInt(uuid.slice(0, 13), 16))
 }
 
 /**
@@ -245,4 +256,53 @@ export async function concurrentRun<T>(
 
     runNext()
   })
+}
+
+/** Create simple event source. Consider using `signal()` for reactive state managment. */
+export class SimpleEventSource<EVENTS extends Record<string, unknown>> {
+  protected handlers = new Map<
+    keyof EVENTS,
+    ((data: EVENTS[keyof EVENTS]) => unknown)[]
+  >()
+
+  /** Send event to all subscribers */
+  public send<T extends keyof EVENTS>(name: T, data: EVENTS[T]): unknown[] {
+    return this.handlers.get(name)?.map((handler) => handler(data)) ?? []
+  }
+
+  /** Subscribe. Returns function to unsubscribe. */
+  public on<T extends keyof EVENTS>(
+    name: T,
+    handler: (data: EVENTS[T]) => unknown,
+  ) {
+    let handlers = this.handlers.get(name)
+    if (!handlers) {
+      handlers = []
+      this.handlers.set(name, handlers)
+    }
+    handlers.push(handler as (data: EVENTS[keyof EVENTS]) => unknown)
+    return () => {
+      removeFromArray(handlers, handler)
+      if (handlers.length === 0) this.handlers.delete(name)
+    }
+  }
+
+  /** Unsubscribe. Alternatively use return function of `on()` */
+  public off<T extends keyof EVENTS>(
+    name: T,
+    handler: (data: EVENTS[T]) => unknown,
+  ) {
+    const handlers = this.handlers.get(name)
+    if (!handlers) return
+    removeFromArray(handlers, handler)
+    if (handlers.length === 0) this.handlers.delete(name)
+  }
+
+  /** Use this to hide send function */
+  public get source() {
+    return {
+      on: this.on.bind(this),
+      off: this.off.bind(this),
+    }
+  }
 }

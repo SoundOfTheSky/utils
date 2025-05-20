@@ -73,7 +73,7 @@ for (const file of files) {
   )) {
     const split = match[4].split(' ');
     const definition = split.slice(0,-1).join(' ');
-    readme+=`\${\\textsf{\\color{${DEFINITION_COLOR[definition]}}${definition}}}$ ${split.at(-1)} - ${extractCommentText(match[1]!)}\n\n---\n`
+    readme+=`__${definition}__ \`${split.at(-1)}\` - ${extractCommentText(match[1]!)}\n\n---\n`
   }
 }
 writeFileSync('./README.md', readme, 'utf8');

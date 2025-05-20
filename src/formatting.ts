@@ -94,7 +94,7 @@ export function formatNumber(
   for (const { start, delimiter, pad, title } of ranges) {
     if (start < min) break
     if (time < start && !pad) continue
-    let value = ((time / start) | 0).toString()
+    let value = Math.floor(time / start).toString()
     time %= start
     if (pad) value = value.padStart(pad, '0')
     if (output) output += delimiter ?? ' '

@@ -36,32 +36,32 @@ export function newStuff() {}
 ## Arrays
 Everything array related.
 
-${\textsf{\color{CornflowerBlue}function}}$ randomFromArray - Returns random element from non-empty array
+__function__ `randomFromArray` - Returns random element from non-empty array
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ shuffleArray - Create new shuffled array
+__function__ `shuffleArray` - Create new shuffled array
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ swap - Swap two elements in array
+__function__ `swap` - Swap two elements in array
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ binarySearch - Binary search in sorted array.
+__function__ `binarySearch` - Binary search in sorted array.
 Compare function should compare your needed value with value on index passed to it.
 If compare returns 0 it means we found target.
 If compare returns > 0 it means we have to cut out bigger side of array.
 If compare returns < 0 it means we have to cut out smaller side of array.
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ chunk - Split array into sub arrays of spicified size
+__function__ `chunk` - Split array into sub arrays of spicified size
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ combinations - Return all combinations of items in array
+__function__ `combinations` - Return all combinations of items in array
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ permutations - Return all permutations of items in array
+__function__ `permutations` - Return all permutations of items in array
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ pushToSorted - Push data to sorted array. Array will always be kept sorted.
+__function__ `pushToSorted` - Push data to sorted array. Array will always be kept sorted.
 
 Compare function should compare your needed value with value on index passed to it.
 If compare returns 0 it means we found target.
@@ -73,13 +73,13 @@ pushToSorted(numArray, 10,  x => x - 10);
 ```
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ removeFromArray - Delete value from array.
+__function__ `removeFromArray` - Delete value from array.
 Only deletes first encountered.
 
 Returns index of deleted value.
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ removeLastFromArray - Delete value from array.
+__function__ `removeLastFromArray` - Delete value from array.
 Only deletes last encountered.
 
 Returns index of deleted value.
@@ -90,16 +90,16 @@ Returns index of deleted value.
 ## Consts
 Some useful consts. That's it.
 
-${\textsf{\color{ForestGreen}const}}$ DAY_MS - Milliseconds in a full day
+__const__ `DAY_MS` - Milliseconds in a full day
 
 ---
-${\textsf{\color{ForestGreen}const}}$ HOUR_MS - Milliseconds in a hour
+__const__ `HOUR_MS` - Milliseconds in a hour
 
 ---
-${\textsf{\color{ForestGreen}const}}$ MIN_MS - Milliseconds in a minute
+__const__ `MIN_MS` - Milliseconds in a minute
 
 ---
-${\textsf{\color{ForestGreen}const}}$ SEC_MS - Milliseconds in a second
+__const__ `SEC_MS` - Milliseconds in a second
 
 ---
 
@@ -107,17 +107,24 @@ ${\textsf{\color{ForestGreen}const}}$ SEC_MS - Milliseconds in a second
 ## Control
 Utils related to code execution flow.
 
-${\textsf{\color{ForestGreen}const}}$ generateNumberId - Get unique number id
+__const__ `SESSION_ID` - Id generated only once per session
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ UUID - Get universally unique string id.
+__function__ `UUID` - Get universally unique string id.
 You can get information then id was generated using extractUUIDDate(uuid)
+- 13 char - timestamp
+- 13 char - SESSION_ID
+- 4 char - incremental id
+
+30 char total.
+
+USING CUSTOM TIMESTAMP MAY RESULT IN COLLISSIONS
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ extractUUIDDate - Extract exact date of uuid generation
+__function__ `extractUUIDDate` - Extract exact date of uuid generation
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ createCashedFunction - Creates cached function. All arguments/results are cached.
+__function__ `createCashedFunction` - Creates cached function. All arguments/results are cached.
 Returns [
 fn [cached function],
 delete [delete cached result for arguments]
@@ -125,7 +132,7 @@ hash
 ]
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ createCashedAsyncFunction - Creates cached function. All arguments/results are cached. Will store in cache resolved data.
+__function__ `createCashedAsyncFunction` - Creates cached function. All arguments/results are cached. Will store in cache resolved data.
 Returns [
 fn [cached function],
 delete [delete cached result for arguments]
@@ -133,29 +140,32 @@ hash
 ]
 
 ---
-${\textsf{\color{CornflowerBlue}async function}}$ retry - Retry async function
+__async function__ `retry` - Retry async function
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ createDebouncedFunction - Create debounced function. Basically adds cooldown to function. Warning: throws!
+__function__ `createDebouncedFunction` - Create debounced function. Basically adds cooldown to function. Warning: throws!
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ createThrottledFunction - Create throttled function. Basically limits function calls in time period. Warning: throws!
+__function__ `createThrottledFunction` - Create throttled function. Basically limits function calls in time period. Warning: throws!
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ createDelayedFunction - Create debounced function. Basically create function that will be called with delay,
+__function__ `createDelayedFunction` - Create debounced function. Basically create function that will be called with delay,
 but if another call comes in, we reset the timer.
 
 ---
-${\textsf{\color{Orange}class}}$ ImmediatePromise - Promise that accepts no callback, but exposes `resolve` and `reject` methods
+__class__ `ImmediatePromise` - Promise that accepts no callback, but exposes `resolve` and `reject` methods
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ wait - setTimeout promisify
+__function__ `wait` - setTimeout promisify
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ noop - Empty function that does nothing
+__function__ `noop` - Empty function that does nothing
 
 ---
-${\textsf{\color{CornflowerBlue}async function}}$ concurrentRun - Run array of async tasks concurrently
+__async function__ `concurrentRun` - Run array of async tasks concurrently
+
+---
+__class__ `SimpleEventSource` - Create simple event source. Consider using `signal()` for reactive state managment.
 
 ---
 
@@ -163,10 +173,10 @@ ${\textsf{\color{CornflowerBlue}async function}}$ concurrentRun - Run array of a
 ## Errors
 Custom errors, finding errors and error handling.
 
-${\textsf{\color{Orange}class}}$ ValidationError - Use as intended error. Basically 4** errors in HTTP
+__class__ `ValidationError` - Use as intended error. Basically 4** errors in HTTP
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ findErrorText - Find error inside anything recursively.
+__function__ `findErrorText` - Find error inside anything recursively.
 Good for finding human-readable errors.
 Tries priority keys first.
 Parses JSON automatically.
@@ -178,37 +188,37 @@ Returns undefind if nothing found.
 ## Formatting
 Anything related to formatting and logging.
 
-${\textsf{\color{Magenta}type}}$ FormatTimeRange - Type for formatTime ranges
+__type__ `FormatTimeRange` - Type for formatTime ranges
 
 ---
-${\textsf{\color{ForestGreen}const}}$ FORMAT_NUMBER_RANGES - Default time range
+__const__ `FORMAT_NUMBER_RANGES` - Default time range
 
 ---
-${\textsf{\color{ForestGreen}const}}$ FORMAT_NUMBER_RANGES_READABLE - Time range more suitable for readability
+__const__ `FORMAT_NUMBER_RANGES_READABLE` - Time range more suitable for readability
 
 ---
-${\textsf{\color{ForestGreen}const}}$ FORMAT_NUMBER_RANGES_BYTES - Bytes range
+__const__ `FORMAT_NUMBER_RANGES_BYTES` - Bytes range
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ formatNumber - Milliseconds to human readable time. Minimum accuracy, if set to 1000 will stop at seconds
+__function__ `formatNumber` - Milliseconds to human readable time. Minimum accuracy, if set to 1000 will stop at seconds
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ camelToSnakeCase - thisCase to this_case
+__function__ `camelToSnakeCase` - thisCase to this_case
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ snakeToCamelCase - this_case to thisCase
+__function__ `snakeToCamelCase` - this_case to thisCase
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ formatBytes - Bytes to KB,MB,GB,TB
+__function__ `formatBytes` - Bytes to KB,MB,GB,TB
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ log - Format logging
+__function__ `log` - Format logging
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ capitalizeFirstLetter - Capitalize first letter
+__function__ `capitalizeFirstLetter` - Capitalize first letter
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ pipe - pipe() can be called on one or more functions, each of which can take the return of previous value.
+__function__ `pipe` - pipe() can be called on one or more functions, each of which can take the return of previous value.
 
 ```ts
 // Takes string, converts to int, calc sqrt, convert and return date
@@ -225,21 +235,21 @@ pipe(
 ## Graphs
 Pos
 
-${\textsf{\color{CornflowerBlue}function}}$ unfoldPathfindingResult - Unfold pathfinding result to path array.
+__function__ `unfoldPathfindingResult` - Unfold pathfinding result to path array.
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ aStar - Pathfind using aStar.
+__function__ `aStar` - Pathfind using aStar.
 Returns a target and map of parents.
 You can use `unfoldPathfindingResult()` to get array of nodes.
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ bfs - Breadth-first search. Slower than dfs.
+__function__ `bfs` - Breadth-first search. Slower than dfs.
 If isTarget is omitted becomes floodfill.
 Returns a target and map of parents.
 You can use `unfoldPathfindingResult()` to get array of nodes.
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ dfs - Depth-first search. Faster than bfs.
+__function__ `dfs` - Depth-first search. Faster than bfs.
 If isTarget is omitted becomes floodfill.
 Returns a target and map of parents.
 You can use `unfoldPathfindingResult()` to get array of nodes.
@@ -250,19 +260,19 @@ You can use `unfoldPathfindingResult()` to get array of nodes.
 ## Numbers
 Numbers, math, etc.
 
-${\textsf{\color{CornflowerBlue}function}}$ random - Random number between min and max. May enable float
+__function__ `random` - Random number between min and max. May enable float
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ parseInt - Same as Number.parseInt but throws if NaN or not safe
+__function__ `parseInt` - Same as Number.parseInt but throws if NaN or not safe
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ parseFloat - Same as Number.parseFloat but throws if NaN or Infinity
+__function__ `parseFloat` - Same as Number.parseFloat but throws if NaN or Infinity
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ factorial - Factorial
+__function__ `factorial` - Factorial
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ fib - Fibonacci
+__function__ `fib` - Fibonacci
 
 ---
 
@@ -270,19 +280,19 @@ ${\textsf{\color{CornflowerBlue}function}}$ fib - Fibonacci
 ## Objects
 [object Object]
 
-${\textsf{\color{CornflowerBlue}function}}$ getPropertyNames - Get all prorerty names, including in prototype
+__function__ `getPropertyNames` - Get all prorerty names, including in prototype
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ objectMap - Map function like for arrays, but for objects
+__function__ `objectMap` - Map function like for arrays, but for objects
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ objectFilter - Filter function like for arrays, but for objects
+__function__ `objectFilter` - Filter function like for arrays, but for objects
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ addPrefixToObject - Adds prefix to every key in object
+__function__ `addPrefixToObject` - Adds prefix to every key in object
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ deepEquals - Check if objects are deep equal
+__function__ `deepEquals` - Check if objects are deep equal
 
 **Supports:**
 - All primitives (String, Number, BigNumber, Null, undefined, Symbol)
@@ -300,10 +310,10 @@ Behavior with types above are not defined, but
 it will still check them by reference.
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ pick - Pick keys from object
+__function__ `pick` - Pick keys from object
 
 ---
-${\textsf{\color{Orange}class}}$ Base - Base class that helps to manage ids and subclasses.
+__class__ `Base` - Base class that helps to manage ids and subclasses.
 
 Include next lines when extending this class:
 ```js
@@ -318,7 +328,7 @@ this.registerSubclass()
 ## Signals
 Reactive signals
 
-${\textsf{\color{CornflowerBlue}function}}$ signal - __SIGNALS SYSTEM__
+__function__ `signal` - __SIGNALS SYSTEM__
 
 Signal can hold any data (except functions),
 when this data has changed any effects containing
@@ -336,7 +346,7 @@ console.log($mySignal())
 ```
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ effect - __SIGNALS SYSTEM__
+__function__ `effect` - __SIGNALS SYSTEM__
 
 Effects are simplest way to react to signal changes.
 Returned data from handler function will be passed to it on next signal change.
@@ -355,7 +365,7 @@ return mySignal;
 })
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ untrack - __SIGNALS SYSTEM__
+__function__ `untrack` - __SIGNALS SYSTEM__
 
 Untrack helps to not react to changes in effects.
 ```ts
@@ -368,7 +378,7 @@ console.log(untrack($a)+$b())
 ```
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ derived - __SIGNALS SYSTEM__
+__function__ `derived` - __SIGNALS SYSTEM__
 
 Creates a derived reactive memoized signal.
 
@@ -378,7 +388,7 @@ const { signal: $sumOfTwo, clear: clearSum } = derived((value) => value + $a(), 
 ```
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ batch - __SIGNALS SYSTEM__
+__function__ `batch` - __SIGNALS SYSTEM__
 
 Batches multiple edits, so they don't call same effects multiple times
 
@@ -398,7 +408,7 @@ $b(5);
 ```
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ when - __SIGNALS SYSTEM__
+__function__ `when` - __SIGNALS SYSTEM__
 
 Returns ImmediatePromise that is resolved when check function returns truthy value.
 If you want to, you can resolve or reject promise beforehand.
@@ -417,15 +427,15 @@ primise.then(() => clearTimeout(timeout))
 ## Time
 Timers, CRON, etc.
 
-${\textsf{\color{CornflowerBlue}function}}$ measurePerformance - Measure performance of a function
+__function__ `measurePerformance` - Measure performance of a function
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ cronInterval - Like setInterval but with cron.
+__function__ `cronInterval` - Like setInterval but with cron.
 Returns clear function.
 For cron string syntax check __getNextCron()__ description
 
 ---
-${\textsf{\color{CornflowerBlue}function}}$ getNextCron - Find next cron date after passed date.
+__function__ `getNextCron` - Find next cron date after passed date.
 
 This function __DOES NOT__ implement regular CRON 1 to 1.
 
@@ -435,7 +445,7 @@ Main differences:
 - Second and millisecond support: __* * * * * 30 999__ - executes every 30 seconds at the end of a second
 
 ---
-${\textsf{\color{Orange}class}}$ SpeedCalculator - Object that calculates speed, ETA and percent of any measurable task.
+__class__ `SpeedCalculator` - Object that calculates speed, ETA and percent of any measurable task.
 
 `push()` chunks into speed calculator and then read `stats` for results.
 `size` - a target then task is finished. Without it only speed is calculated.
@@ -447,45 +457,45 @@ ${\textsf{\color{Orange}class}}$ SpeedCalculator - Object that calculates speed,
 ## Types
 Damn, I **love** TypeScript.
 
-${\textsf{\color{Magenta}type}}$ Primitive - Values that are copied by value, not by reference
+__type__ `Primitive` - Values that are copied by value, not by reference
 
 ---
-${\textsf{\color{Magenta}type}}$ AnyFunction - Function with any arguments or return type
+__type__ `AnyFunction` - Function with any arguments or return type
 
 ---
-${\textsf{\color{Magenta}type}}$ Falsy - Values that convert to false
+__type__ `Falsy` - Values that convert to false
 
 ---
-${\textsf{\color{Magenta}type}}$ Optional - Make keys in object optional
+__type__ `Optional` - Make keys in object optional
 
 ---
-${\textsf{\color{Magenta}type}}$ RequiredKey - Make keys in object required
+__type__ `RequiredKey` - Make keys in object required
 
 ---
-${\textsf{\color{Magenta}type}}$ Constructor - Get contructor type of an instance
+__type__ `Constructor` - Get contructor type of an instance
 
 ---
-${\textsf{\color{Magenta}type}}$ AwaitedObject - Recursively resolves promises in objects and arrays
+__type__ `AwaitedObject` - Recursively resolves promises in objects and arrays
 
 ---
-${\textsf{\color{Magenta}type}}$ JSONSerializable - Anything that can be serialized to JSON
+__type__ `JSONSerializable` - Anything that can be serialized to JSON
 
 ---
-${\textsf{\color{Magenta}type}}$ ObjectAddPrefix - Adds prefix to all keys in object
+__type__ `ObjectAddPrefix` - Adds prefix to all keys in object
 
 ---
-${\textsf{\color{Magenta}type}}$ CamelToSnakeCase - Convert type of thisCase to this_case
+__type__ `CamelToSnakeCase` - Convert type of thisCase to this_case
 
 ---
-${\textsf{\color{Magenta}type}}$ ObjectCamelToSnakeCase - Convert object keys of thisCase to this_case
+__type__ `ObjectCamelToSnakeCase` - Convert object keys of thisCase to this_case
 
 ---
-${\textsf{\color{Magenta}type}}$ SnakeToCamel - Convert type of this-case to thisCase
+__type__ `SnakeToCamel` - Convert type of this-case to thisCase
 
 ---
-${\textsf{\color{Magenta}type}}$ ObjectSnakeToCamel - Convert object keys of this-case to thisCase
+__type__ `ObjectSnakeToCamel` - Convert object keys of this-case to thisCase
 
 ---
-${\textsf{\color{Magenta}type}}$ Concat - Concat types of array or objects
+__type__ `Concat` - Concat types of array or objects
 
 ---
