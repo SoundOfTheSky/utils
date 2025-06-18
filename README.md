@@ -10,10 +10,10 @@
 
 `npm i @softsky/utils`
 
+__ZERO DEPENDENCIES__ utils library. Test coverage __100%__.
+
 Usual utils plus more obscure stuff that I've never seen in any library. 
 Also fancy TypeScript generics and types that I often use.
-
-Test coverage __100%__.
 </div>
 
 # Contribute
@@ -363,6 +363,7 @@ const mySignal = $mySignal()
 if(last>mySignal) console.log('Increment!')
 return mySignal;
 })
+```
 
 ---
 __function__ `untrack` - __SIGNALS SYSTEM__

@@ -28,10 +28,10 @@ let readme = `<div align="center">
 
 \`npm i @softsky/utils\`
 
+__ZERO DEPENDENCIES__ utils library. Test coverage __100%__.
+
 Usual utils plus more obscure stuff that I've never seen in any library. 
 Also fancy TypeScript generics and types that I often use.
-
-Test coverage __100%__.
 </div>
 
 # Contribute

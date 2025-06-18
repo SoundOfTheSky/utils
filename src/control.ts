@@ -165,6 +165,7 @@ export function createDelayedFunction<T, V extends unknown[]>(
 type ResolveFunction<T> = undefined extends T
   ? (value?: T | PromiseLike<T>) => void
   : (value: T | PromiseLike<T>) => void
+
 /** Promise that accepts no callback, but exposes `resolve` and `reject` methods */
 export class ImmediatePromise<T> extends Promise<T> {
   public resolve!: ResolveFunction<T>

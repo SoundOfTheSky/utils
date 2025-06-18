@@ -82,6 +82,7 @@ function clearEffect(handler: AnyFunction) {
  *   if(last>mySignal) console.log('Increment!')
  *   return mySignal;
  * })
+ * ```
  */
 export function effect<T>(
   handler: (argument: T | undefined) => T,
