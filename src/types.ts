@@ -83,3 +83,27 @@ export type Concat<T, U> = T extends any[]
     ? [...T, ...U]
     : never
   : T & U
+
+/**
+ * Visual only overhaul. Shows final type result on hover.
+ * ```ts
+ * type a = {a: '1'}
+ * type b = Prettify<a & { b: 'b' }>
+ * ```
+ * On hovering b it will show
+ * ```ts
+ * type b = {
+ *   a: "1";
+ *   b: "b";
+ * }
+ * ```
+ * instead of
+ * ```ts
+ * type b = a & {
+ *   b: "b";
+ * }
+ * ```
+ * */
+export type Prettify<T extends object> = {
+  [k in keyof T]: T[k]
+} & {}

@@ -42,10 +42,15 @@ describe('UUID', () => {
 
 describe('createCashedFunction', () => {
   it('caches function results', () => {
-    const function_ = (x: number) => x * 2
+    let calls = 0
+    const function_ = (x: number) => {
+      calls++
+      return x * 2
+    }
     const [cachedFunction] = createCashedFunction(function_)
     expect(cachedFunction(2)).toBe(4)
     expect(cachedFunction(2)).toBe(4)
+    expect(calls).toBe(1)
   })
 })
 
@@ -73,6 +78,8 @@ describe('retry', () => {
       return Promise.resolve('Success')
     }
     expect(retry(function_, 5)).resolves.toBe('Success')
+    attempts = 0
+    expect(retry(function_, 1)).rejects.toThrow('Fail')
   })
 })
 

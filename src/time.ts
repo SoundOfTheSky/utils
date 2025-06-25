@@ -4,6 +4,7 @@
 
 import { HOUR_MS } from './consts'
 import { ValidationError } from './errors'
+import { AnyFunction } from './types'
 
 /** Measure performance of a function */
 export function measurePerformance(function_: () => unknown, timeCheck = 16.6) {
@@ -14,6 +15,49 @@ export function measurePerformance(function_: () => unknown, timeCheck = 16.6) {
     executions++
   }
   return executions
+}
+
+/**
+ * Original setTimeout and setIntval known for accumulating delay
+ * and causing problem with timeouts bigger than 32bit integer.
+ *
+ * This timeout wrapper fixes them. Returns clear function.
+ */
+export function setSafeTimeout(handler: AnyFunction, delay: number) {
+  const end = Date.now() + delay
+  let timeout: ReturnType<typeof setTimeout>
+  function r() {
+    const timeLeft = end - Date.now()
+    if (timeLeft < 1) handler()
+    else timeout = setTimeout(r, Math.min(timeLeft, HOUR_MS))
+  }
+  r()
+  return () => {
+    clearTimeout(timeout)
+  }
+}
+
+/**
+ * Original setTimeout and setIntval known for accumulating delay
+ * and causing problem with timeouts bigger than 32bit integer.
+ *
+ * This interval wrapper fixes them. Returns clear function.
+ */
+export function setSafeInterval(handler: AnyFunction, delay: number) {
+  let end = Date.now() + delay
+  let timeout: ReturnType<typeof setInterval>
+  function r() {
+    const timeLeft = end - Date.now()
+    if (timeLeft < 1) {
+      end += delay
+      handler()
+      r()
+    } else timeout = setTimeout(r, Math.min(timeLeft, HOUR_MS))
+  }
+  r()
+  return () => {
+    clearInterval(timeout)
+  }
 }
 
 /** Like setInterval but with cron.

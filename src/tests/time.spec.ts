@@ -6,6 +6,8 @@ import {
   cronInterval,
   getNextCron,
   measurePerformance,
+  setSafeInterval,
+  setSafeTimeout,
   SpeedCalculator,
 } from '../time'
 
@@ -94,5 +96,67 @@ describe('cronInterval', () => {
     await wait(1000)
     clear()
     expect(function_).toBeCalledTimes(5)
+  })
+})
+
+describe('setSafeTimeout', () => {
+  it('calls the handler after the delay', async () => {
+    const function_ = mock(noop)
+    setSafeTimeout(function_, 50)
+    expect(function_).toBeCalledTimes(0)
+    await wait(30)
+    expect(function_).toBeCalledTimes(0)
+    await wait(30)
+    expect(function_).toBeCalledTimes(1)
+    await wait(70)
+    expect(function_).toBeCalledTimes(1)
+  })
+
+  it('does not call the handler if cleared', async () => {
+    const function_ = mock(noop)
+    const clear = setSafeTimeout(function_, 50)
+    clear()
+    await wait(70)
+    expect(function_).toBeCalledTimes(0)
+  })
+})
+
+describe('setSafeInterval', () => {
+  it('calls the handler after the delay', async () => {
+    const function_ = mock(noop)
+    setSafeInterval(function_, 50)
+    expect(function_).toBeCalledTimes(0)
+    await wait(30)
+    expect(function_).toBeCalledTimes(0)
+    await wait(30)
+    expect(function_).toBeCalledTimes(1)
+    await wait(70)
+    expect(function_).toBeCalledTimes(2)
+  })
+
+  it('does not call the handler if cleared', async () => {
+    const function_ = mock(noop)
+    const clear = setSafeInterval(function_, 50)
+    await wait(70)
+    expect(function_).toBeCalledTimes(1)
+    await wait(10)
+    clear()
+    await wait(100)
+    expect(function_).toBeCalledTimes(1)
+  })
+
+  it('no drift', async () => {
+    let calls = 0
+    const function_ = () => calls++
+    setSafeInterval(function_, 1)
+    // No drift after promise
+    await wait(1000)
+    expect(calls).toBeWithin(998, 1002)
+    const waitSec = Date.now() + 1000
+    // No drift after lag
+    // eslint-disable-next-line no-empty
+    while (Date.now() < waitSec) {}
+    await wait(0)
+    expect(calls).toBeWithin(1998, 2002)
   })
 })

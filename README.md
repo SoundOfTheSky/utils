@@ -431,6 +431,18 @@ Timers, CRON, etc.
 __function__ `measurePerformance` - Measure performance of a function
 
 ---
+__function__ `setSafeTimeout` - Original setTimeout and setIntval known for accumulating delay
+and causing problem with timeouts bigger than 32bit integer.
+
+This timeout wrapper fixes them. Returns clear function.
+
+---
+__function__ `setSafeInterval` - Original setTimeout and setIntval known for accumulating delay
+and causing problem with timeouts bigger than 32bit integer.
+
+This interval wrapper fixes them. Returns clear function.
+
+---
 __function__ `cronInterval` - Like setInterval but with cron.
 Returns clear function.
 For cron string syntax check __getNextCron()__ description
@@ -498,5 +510,25 @@ __type__ `ObjectSnakeToCamel` - Convert object keys of this-case to thisCase
 
 ---
 __type__ `Concat` - Concat types of array or objects
+
+---
+__type__ `Prettify` - Visual only overhaul. Shows final type result on hover.
+```ts
+type a = {a: '1'}
+type b = Prettify<a & { b: 'b' }>
+```
+On hovering b it will show
+```ts
+type b = {
+a: "1";
+b: "b";
+}
+```
+instead of
+```ts
+type b = a & {
+b: "b";
+}
+```
 
 ---
