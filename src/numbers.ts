@@ -5,8 +5,8 @@ import { ValidationError } from './errors'
 
 /** Random number between min and max. May enable float */
 export function random(min: number, max: number, float?: boolean): number {
-  const number_ = Math.random() * (max - min) + min
-  return float ? number_ : Math.round(number_)
+  const number = Math.random() * (max - min) + min
+  return float ? number : Math.round(number)
 }
 
 /** Same as Number.parseInt but throws if NaN or not safe */
@@ -48,4 +48,44 @@ export function fib(n: number) {
     b = temporary
   }
   return a
+}
+
+/** Clamp numbers to max and min */
+export function clamp(value: number, min = -Infinity, max = Infinity) {
+  if (value > max) return max
+  if (value < min) return min
+  return value
+}
+
+/** Is number in range. Inclusive. */
+export function inRange(value: number, min = -Infinity, max = Infinity) {
+  return value <= max && value >= min
+}
+
+/** Calucalate avarage from array of numbers */
+export function mean(array: number[]) {
+  let sum = 0
+  for (let index = 0; index < array.length; index++) sum += array[index]!
+  return sum / array.length
+}
+
+/**
+ * Round with precision.
+ *
+ * ```ts
+ * round(1.2345); // 1
+ * round(1.2345, 2); // 1.23
+ * round(1.2345, 10); // 1.2345
+ * ```
+ */
+export function round(value: number, precision = 0) {
+  const mult = 10 ** precision
+  return Math.round(value * mult) / mult
+}
+
+/** Sum of array of numbers */
+export function sum(array: number[]) {
+  let result = 0
+  for (let index = 0; index < array.length; index++) result += array[index]!
+  return result
 }

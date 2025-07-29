@@ -11,6 +11,23 @@ export class ValidationError extends Error {
   public override name = 'ValidationError'
 }
 
+/**
+ *  Use as intended error. Basically 4** errors in HTTP
+ */
+export class TimeoutError extends Error {
+  public override name = 'TimeoutError'
+  public constructor() {
+    super('The operation has timed out')
+  }
+}
+
+export class DelayedError extends Error {
+  public override name = 'DelayedError'
+  public constructor() {
+    super('The operation is delayed and can not be executed now')
+  }
+}
+
 const defaultPriorityErrorKeys = [
   'message',
   'messages',

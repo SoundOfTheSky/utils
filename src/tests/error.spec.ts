@@ -1,7 +1,12 @@
 // eslint-disable-next-line import-x/no-unresolved
 import { describe, expect, it } from 'bun:test'
 
-import { findErrorText, ValidationError } from '../errors'
+import {
+  DelayedError,
+  findErrorText,
+  TimeoutError,
+  ValidationError,
+} from '../errors'
 
 describe('ValidationError', () => {
   it('Must create', () => {
@@ -9,7 +14,24 @@ describe('ValidationError', () => {
       cause: 'test',
     })
     expect(error.name).toBe('ValidationError')
+    expect(error.message).toBe('asdasd')
     expect(error.cause).toBe('test')
+  })
+})
+describe('TimeoutError', () => {
+  it('Must create', () => {
+    const error = new TimeoutError()
+    expect(error.name).toBe('TimeoutError')
+    expect(error.message).toBe('The operation has timed out')
+  })
+})
+describe('DelayedError', () => {
+  it('Must create', () => {
+    const error = new DelayedError()
+    expect(error.name).toBe('DelayedError')
+    expect(error.message).toBe(
+      'The operation is delayed and can not be executed now',
+    )
   })
 })
 describe('HandleErrorService', () => {

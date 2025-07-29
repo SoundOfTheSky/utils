@@ -1,6 +1,7 @@
 // eslint-disable-next-line import-x/no-unresolved
-import { beforeEach, describe, expect, it } from 'bun:test'
+import { beforeEach, describe, expect, it, mock } from 'bun:test'
 
+import { noop } from '../control'
 import {
   addPrefixToObject,
   Base,
@@ -214,5 +215,46 @@ describe('Base class', () => {
     a.id = 100
     expect(A.idMap.get(id) as A).toBeUndefined()
     expect(A.idMap.get(a.id) as A).toBe(a)
+  })
+
+  it('should remove instance from idMap on destroy and call runOnDestroy', () => {
+    const a = new Base()
+    const spy1 = mock(noop)
+    const spy2 = mock(noop)
+    a.runOnDestroy.push(spy1, spy2)
+
+    a.destroy()
+
+    expect(Base.idMap.has(a.id)).toBe(false)
+    expect(spy1).toHaveBeenCalled()
+    expect(spy2).toHaveBeenCalled()
+  })
+
+  it('should register and auto-remove event listeners on destroy', () => {
+    const target = new EventTarget()
+    const listener = mock(noop)
+    const a = new (class extends Base {
+      public constructor() {
+        super()
+        this.registerEvent(target, 'custom', listener)
+      }
+    })()
+    const event = new Event('custom')
+    target.dispatchEvent(event)
+    expect(listener).toHaveBeenCalledTimes(1)
+
+    a.destroy()
+    target.dispatchEvent(event)
+    expect(listener).toHaveBeenCalledTimes(1) // no further calls
+  })
+
+  it('should replace id and update idMap correctly', () => {
+    const a = new Base()
+    const oldId = a.id
+    const newId = 99
+    a.id = newId
+
+    expect(Base.idMap.get(oldId)).toBeUndefined()
+    expect(Base.idMap.get(newId)).toBe(a)
   })
 })

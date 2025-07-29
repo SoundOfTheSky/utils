@@ -7,11 +7,11 @@ import { ValidationError } from './errors'
 import { AnyFunction } from './types'
 
 /** Measure performance of a function */
-export function measurePerformance(function_: () => unknown, timeCheck = 16.6) {
+export function measurePerformance(run: () => unknown, timeCheck = 16.6) {
   const endTime = performance.now() + timeCheck
   let executions = 0
   while (performance.now() < endTime) {
-    function_()
+    run()
     executions++
   }
   return executions
@@ -63,7 +63,7 @@ export function setSafeInterval(handler: AnyFunction, delay: number) {
 /** Like setInterval but with cron.
  *  Returns clear function.
  *  For cron string syntax check __getNextCron()__ description */
-export function cronInterval(function_: () => unknown, cronString: string) {
+export function cronInterval(run: () => unknown, cronString: string) {
   let timeout: number
   let next = getNextCron(cronString).getTime()
   const r = () => {
@@ -72,7 +72,7 @@ export function cronInterval(function_: () => unknown, cronString: string) {
     if (d < 1) {
       next = getNextCron(cronString).getTime()
       d = next - now
-      function_()
+      run()
     }
     timeout = setTimeout(r, Math.min(d, HOUR_MS)) as unknown as number
   }

@@ -90,65 +90,65 @@ describe('SpeedCalculator', () => {
 
 describe('cronInterval', () => {
   it('schedules a function based on a cron string', async () => {
-    const function_ = mock(noop)
+    const run = mock(noop)
     await wait(Date.now() % 1000)
-    const clear = cronInterval(function_, '*/200 * * * * * *')
+    const clear = cronInterval(run, '*/200 * * * * * *')
     await wait(1000)
     clear()
-    expect(function_).toBeCalledTimes(5)
+    expect(run).toBeCalledTimes(5)
   })
 })
 
 describe('setSafeTimeout', () => {
   it('calls the handler after the delay', async () => {
-    const function_ = mock(noop)
-    setSafeTimeout(function_, 50)
-    expect(function_).toBeCalledTimes(0)
+    const run = mock(noop)
+    setSafeTimeout(run, 50)
+    expect(run).toBeCalledTimes(0)
     await wait(30)
-    expect(function_).toBeCalledTimes(0)
+    expect(run).toBeCalledTimes(0)
     await wait(30)
-    expect(function_).toBeCalledTimes(1)
+    expect(run).toBeCalledTimes(1)
     await wait(70)
-    expect(function_).toBeCalledTimes(1)
+    expect(run).toBeCalledTimes(1)
   })
 
   it('does not call the handler if cleared', async () => {
-    const function_ = mock(noop)
-    const clear = setSafeTimeout(function_, 50)
+    const run = mock(noop)
+    const clear = setSafeTimeout(run, 50)
     clear()
     await wait(70)
-    expect(function_).toBeCalledTimes(0)
+    expect(run).toBeCalledTimes(0)
   })
 })
 
 describe('setSafeInterval', () => {
   it('calls the handler after the delay', async () => {
-    const function_ = mock(noop)
-    setSafeInterval(function_, 50)
-    expect(function_).toBeCalledTimes(0)
+    const run = mock(noop)
+    setSafeInterval(run, 50)
+    expect(run).toBeCalledTimes(0)
     await wait(30)
-    expect(function_).toBeCalledTimes(0)
+    expect(run).toBeCalledTimes(0)
     await wait(30)
-    expect(function_).toBeCalledTimes(1)
+    expect(run).toBeCalledTimes(1)
     await wait(70)
-    expect(function_).toBeCalledTimes(2)
+    expect(run).toBeCalledTimes(2)
   })
 
   it('does not call the handler if cleared', async () => {
-    const function_ = mock(noop)
-    const clear = setSafeInterval(function_, 50)
+    const run = mock(noop)
+    const clear = setSafeInterval(run, 50)
     await wait(70)
-    expect(function_).toBeCalledTimes(1)
+    expect(run).toBeCalledTimes(1)
     await wait(10)
     clear()
     await wait(100)
-    expect(function_).toBeCalledTimes(1)
+    expect(run).toBeCalledTimes(1)
   })
 
   it('no drift', async () => {
     let calls = 0
-    const function_ = () => calls++
-    setSafeInterval(function_, 1)
+    const run = () => calls++
+    setSafeInterval(run, 1)
     // No drift after promise
     await wait(1000)
     expect(calls).toBeWithin(998, 1002)

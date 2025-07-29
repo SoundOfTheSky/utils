@@ -3,6 +3,7 @@
  */
 
 import { removeFromArray } from './arrays'
+import { DelayedError, TimeoutError } from './errors'
 import { AwaitedObject, JSONSerializable } from './types'
 
 let lastIncId = Math.floor(Math.random() * 0x1_00_00)
@@ -46,19 +47,19 @@ export function extractUUIDDate(uuid: string) {
  * ]
  */
 export function createCashedFunction<T, V extends JSONSerializable[]>(
-  function_: (...arguments_: V) => T,
+  run: (...data: V) => T,
 ) {
   const hash = new Map<string, T>()
   return [
-    (...arguments_: V) => {
-      const key = JSON.stringify(arguments_)
+    (...data: V) => {
+      const key = JSON.stringify(data)
       const value = hash.get(key)
       if (value) return value
-      const newValue = function_(...arguments_)
+      const newValue = run(...data)
       hash.set(key, newValue)
       return newValue
     },
-    (...arguments_: V) => hash.delete(JSON.stringify(arguments_)),
+    (...data: V) => hash.delete(JSON.stringify(data)),
     hash,
   ] as const
 }
@@ -72,32 +73,32 @@ export function createCashedFunction<T, V extends JSONSerializable[]>(
  * ]
  */
 export function createCashedAsyncFunction<T, V extends JSONSerializable[]>(
-  function_: (...arguments_: V) => Promise<T>,
+  run: (...data: V) => Promise<T>,
 ) {
   const hash = new Map<string, T>()
   return [
-    async (...arguments_: V) => {
-      const key = JSON.stringify(arguments_)
+    async (...data: V) => {
+      const key = JSON.stringify(data)
       const value = hash.get(key)
       if (value) return value
-      const newValue = await function_(...arguments_)
+      const newValue = await run(...data)
       hash.set(key, newValue)
       return newValue
     },
-    (...arguments_: V) => hash.delete(JSON.stringify(arguments_)),
+    (...data: V) => hash.delete(JSON.stringify(data)),
     hash,
   ] as const
 }
 
 /** Retry async function */
 export async function retry<T>(
-  function_: () => Promise<T>,
+  run: () => Promise<T>,
   retries = 5,
   interval: number | number[] = 0,
   ignore?: (error: unknown) => boolean,
 ): Promise<T> {
   try {
-    return await function_()
+    return await run()
   } catch (error) {
     if (retries === 0 || ignore?.(error)) throw error
     await wait(
@@ -105,57 +106,57 @@ export async function retry<T>(
         ? interval
         : interval[interval.length - retries]!,
     )
-    return retry(function_, retries - 1, interval)
+    return retry(run, retries - 1, interval)
   }
 }
 
 /** Create debounced function. Basically adds cooldown to function. Warning: throws! */
 export function createDebouncedFunction<T, V extends unknown[]>(
-  function_: (...arguments_: V) => T,
+  run: (...data: V) => T,
   time: number,
-): (...arguments_: V) => T {
+): (...data: V) => T {
   let nextExec = 0
-  return (...arguments_: V) => {
+  return (...data: V) => {
     const now = Date.now()
-    if (nextExec > now) throw new Error('Debounced')
+    if (nextExec > now) throw new DelayedError()
     nextExec = now + time
-    return function_(...arguments_)
+    return run(...data)
   }
 }
 
 /** Create throttled function. Basically limits function calls in time period. Warning: throws! */
 export function createThrottledFunction<T, V extends unknown[]>(
-  function_: (...arguments_: V) => T,
+  run: (...data: V) => T,
   calls: number,
   time: number,
-): (...arguments_: V) => T {
+): (...data: V) => T {
   let nextClear = 0
   let amount = 0
-  return (...arguments_: V) => {
+  return (...data: V) => {
     const now = Date.now()
     if (nextClear <= now) {
       nextClear = now + time
       amount = 0
     }
-    if (amount === calls) throw new Error('Throttled')
+    if (amount === calls) throw new DelayedError()
     amount++
-    return function_(...arguments_)
+    return run(...data)
   }
 }
 
 /** Create debounced function. Basically create function that will be called with delay,
- * but if another call comes in, we reset the timer. */
+ * but if another call comes in, we reset the timer (previous function isn't called). */
 export function createDelayedFunction<T, V extends unknown[]>(
-  function_: (...arguments_: V) => T,
+  run: (...data: V) => T,
   time: number,
-): (...arguments_: V) => Promise<T> {
+): (...data: V) => Promise<T> {
   let timeout: ReturnType<typeof setTimeout>
   let activePromise: ImmediatePromise<T> | undefined
-  return (...arguments_: V) => {
+  return (...data: V) => {
     activePromise ??= new ImmediatePromise()
     clearTimeout(timeout)
     timeout = setTimeout(() => {
-      activePromise?.resolve(function_(...arguments_))
+      activePromise?.resolve(run(...data))
       activePromise = undefined
     }, time)
     return activePromise
@@ -219,6 +220,15 @@ export function wait(time: number) {
   return new Promise((r) => setTimeout(r, time))
 }
 
+/** Reject after specified time */
+export function timeout(time: number): Promise<never> {
+  return new Promise((_, reject) =>
+    setTimeout(() => {
+      reject(new TimeoutError())
+    }, time),
+  )
+}
+
 /** Empty function that does nothing */
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export function noop() {}
@@ -228,35 +238,8 @@ export async function concurrentRun<T>(
   tasks: (() => Promise<T>)[],
   concurrency = 4,
 ): Promise<T[]> {
-  return new Promise((resolve, reject) => {
-    const results = new Array(tasks.length) as T[]
-    let inProgress = 0
-    let index = 0
-    let completed = 0
-
-    function runNext() {
-      if (completed === tasks.length) {
-        resolve(results)
-        return
-      }
-
-      while (inProgress < concurrency && index < tasks.length) {
-        const currentIndex = index++
-        const task = tasks[currentIndex]!
-        inProgress++
-        task()
-          .then((result) => {
-            results[currentIndex] = result
-            inProgress--
-            completed++
-            runNext()
-          })
-          .catch(reject)
-      }
-    }
-
-    runNext()
-  })
+  const semaphore = new Semaphore(concurrency)
+  return Promise.all(tasks.map(semaphore.run.bind(semaphore)))
 }
 
 /** Create simple event source. Consider using `signal()` for reactive state managment. */
@@ -306,4 +289,76 @@ export class SimpleEventSource<EVENTS extends Record<string, unknown>> {
       off: this.off.bind(this),
     }
   }
+}
+
+/**
+ * Semaphore is used to limit concurrent tasks by delaying promise.
+ *
+ * ```ts
+ * const semaphore = new Semaphore(2);
+ *
+ * async function task() {
+ *   await semaphore.acquire();
+ *   try {
+ *     // This code can only be executed by two tasks at the same time
+ *   } finally {
+ *     semaphore.release();
+ *   }
+ * }
+ * task();
+ * task();
+ * task(); // This task will wait until one of the previous tasks releases the semaphore.
+ *
+ * // === SHORTHAND ===
+ * semaphore.run(()=>{
+ *    // Your code
+ * })
+ * semaphore.run(()=>{
+ *    // Your code
+ * })
+ * // ...
+ * ```
+ */
+export class Semaphore {
+  /** Tasks running. */
+  public running = 0
+  protected deferredTasks: (() => void)[] = []
+
+  public constructor(
+    /** The maximum number of concurrent operations allowed.*/
+    public capacity: number,
+  ) {}
+
+  /** Acquires a semaphore, blocking if necessary until one is available. */
+  public async acquire(): Promise<void> {
+    if (this.running === this.capacity)
+      return new Promise<void>((resolve) => {
+        this.deferredTasks.push(resolve)
+      })
+    this.running++
+  }
+
+  /** Releases a semaphore, allowing one more operation to proceed. */
+  public release(): void {
+    this.running--
+    this.deferredTasks.shift()?.()
+  }
+
+  /** Shorthand for running functions */
+  public async run<T>(run: () => T): Promise<T> {
+    await this.acquire()
+    try {
+      return await run()
+    } finally {
+      this.release()
+    }
+  }
+}
+
+/** Add timeout to a promise */
+export async function withTimeout<T>(
+  run: () => Promise<T>,
+  ms: number,
+): Promise<T> {
+  return Promise.race([run(), timeout(ms)])
 }

@@ -150,13 +150,16 @@ __function__ `createThrottledFunction` - Create throttled function. Basically li
 
 ---
 __function__ `createDelayedFunction` - Create debounced function. Basically create function that will be called with delay,
-but if another call comes in, we reset the timer.
+but if another call comes in, we reset the timer (previous function isn't called).
 
 ---
 __class__ `ImmediatePromise` - Promise that accepts no callback, but exposes `resolve` and `reject` methods
 
 ---
 __function__ `wait` - setTimeout promisify
+
+---
+__function__ `timeout` - Reject after specified time
 
 ---
 __function__ `noop` - Empty function that does nothing
@@ -168,12 +171,46 @@ __async function__ `concurrentRun` - Run array of async tasks concurrently
 __class__ `SimpleEventSource` - Create simple event source. Consider using `signal()` for reactive state managment.
 
 ---
+__class__ `Semaphore` - Semaphore is used to limit concurrent tasks by delaying promise.
+
+```ts
+const semaphore = new Semaphore(2);
+
+async function task() {
+await semaphore.acquire();
+try {
+// This code can only be executed by two tasks at the same time
+} finally {
+semaphore.release();
+}
+}
+task();
+task();
+task(); // This task will wait until one of the previous tasks releases the semaphore.
+
+// === SHORTHAND ===
+semaphore.run(()=>{
+// Your code
+})
+semaphore.run(()=>{
+// Your code
+})
+// ...
+```
+
+---
+__async function__ `withTimeout` - Add timeout to a promise
+
+---
 
 
 ## Errors
 Custom errors, finding errors and error handling.
 
 __class__ `ValidationError` - Use as intended error. Basically 4** errors in HTTP
+
+---
+__class__ `TimeoutError` - Use as intended error. Basically 4** errors in HTTP
 
 ---
 __function__ `findErrorText` - Find error inside anything recursively.
@@ -275,6 +312,27 @@ __function__ `factorial` - Factorial
 __function__ `fib` - Fibonacci
 
 ---
+__function__ `clamp` - Clamp numbers to max and min
+
+---
+__function__ `inRange` - Is number in range. Inclusive.
+
+---
+__function__ `mean` - Calucalate avarage from array of numbers
+
+---
+__function__ `round` - Round with precision.
+
+```ts
+round(1.2345); // 1
+round(1.2345, 2); // 1.23
+round(1.2345, 10); // 1.2345
+```
+
+---
+__function__ `sum` - Sum of array of numbers
+
+---
 
 
 ## Objects
@@ -352,7 +410,7 @@ Effects are simplest way to react to signal changes.
 Returned data from handler function will be passed to it on next signal change.
 Returns a function that will clear the effect.
 
-```ts
+
 // Will print signal on change
 effect(()=>{
 console.log($mySignal())
@@ -363,7 +421,6 @@ const mySignal = $mySignal()
 if(last>mySignal) console.log('Increment!')
 return mySignal;
 })
-```
 
 ---
 __function__ `untrack` - __SIGNALS SYSTEM__
@@ -513,19 +570,16 @@ __type__ `Concat` - Concat types of array or objects
 
 ---
 __type__ `Prettify` - Visual only overhaul. Shows final type result on hover.
+
 ```ts
 type a = {a: '1'}
 type b = Prettify<a & { b: 'b' }>
-```
-On hovering b it will show
-```ts
+// On hovering b it will show
 type b = {
 a: "1";
 b: "b";
 }
-```
-instead of
-```ts
+// instead of
 type b = a & {
 b: "b";
 }

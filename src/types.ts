@@ -13,7 +13,7 @@ export type Primitive =
   | undefined
 
 /** Function with any arguments or return type */
-export type AnyFunction = (...arguments_: any[]) => any
+export type AnyFunction = (...data: any[]) => any
 
 /** Values that convert to false */
 export type Falsy = false | '' | 0 | null | undefined
@@ -86,19 +86,16 @@ export type Concat<T, U> = T extends any[]
 
 /**
  * Visual only overhaul. Shows final type result on hover.
+ *
  * ```ts
  * type a = {a: '1'}
  * type b = Prettify<a & { b: 'b' }>
- * ```
- * On hovering b it will show
- * ```ts
+ * // On hovering b it will show
  * type b = {
  *   a: "1";
  *   b: "b";
  * }
- * ```
- * instead of
- * ```ts
+ * // instead of
  * type b = a & {
  *   b: "b";
  * }

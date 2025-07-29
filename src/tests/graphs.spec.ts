@@ -9,6 +9,7 @@ const graph = {
   C: ['B'],
   D: ['A', 'E'],
   E: ['B', 'D'],
+  F: ['B', 'D'],
 } as Record<string, string[]>
 
 const getNeighbors = (node: string) => graph[node] ?? []
@@ -24,6 +25,24 @@ describe('bfs', () => {
     const path = unfoldPathfindingResult({ target, parents })
     expect(path).toEqual(['A', 'B', 'C'])
   })
+  it('finds no path if none exist', () => {
+    const { target, parents } = bfs({
+      start: 'A',
+      getNeighbors,
+      isTarget: (node) => node === 'F',
+    })
+    expect(target).toBeUndefined()
+    expect(parents).toEqual(
+      new Map(
+        Object.entries({
+          B: 'A',
+          D: 'A',
+          C: 'B',
+          E: 'B',
+        }),
+      ),
+    )
+  })
 })
 
 describe('dfs', () => {
@@ -35,10 +54,26 @@ describe('dfs', () => {
     })
     expect(target).toBe('C')
     const path = unfoldPathfindingResult({ target, parents })
-    // Multiple valid paths; just ensure start and end are correct
-    expect(path[0]).toBe('A')
-    expect(path.at(-1)).toBe('C')
-    expect(path).toContain('B')
+    expect(path).toEqual(['A', 'B', 'C'])
+  })
+
+  it('finds no path if none exist', () => {
+    const { target, parents } = dfs({
+      start: 'A',
+      getNeighbors,
+      isTarget: (node) => node === 'F',
+    })
+    expect(target).toBeUndefined()
+    expect(parents).toEqual(
+      new Map(
+        Object.entries({
+          B: 'A',
+          D: 'A',
+          E: 'D',
+          C: 'B',
+        }),
+      ),
+    )
   })
 })
 
@@ -49,6 +84,7 @@ describe('aStar', () => {
     C: 0,
     D: 2,
     E: 1,
+    F: 1,
   }
   const heuristic = (node: string) => costs[node] ?? 10
   const getWeight = () => 1
@@ -64,6 +100,26 @@ describe('aStar', () => {
     expect(target).toBe('C')
     const path = unfoldPathfindingResult({ target, parents })
     expect(path).toEqual(['A', 'B', 'C'])
+  })
+  it('finds no path if none exist', () => {
+    const { target, parents } = aStar({
+      start: 'A',
+      getNeighbors,
+      getWeight,
+      heuristic,
+      isTarget: (node) => node === 'F',
+    })
+    expect(target).toBeUndefined()
+    expect(parents).toEqual(
+      new Map(
+        Object.entries({
+          B: 'A',
+          D: 'A',
+          C: 'B',
+          E: 'B',
+        }),
+      ),
+    )
   })
 })
 

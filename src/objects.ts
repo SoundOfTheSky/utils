@@ -2,7 +2,7 @@
  * [object Object]
  */
 
-import { Constructor, ObjectAddPrefix } from './types'
+import { AnyFunction, Constructor, ObjectAddPrefix } from './types'
 
 /** Get all prorerty names, including in prototype */
 export function getPropertyNames(object: object, keys = new Set()) {
@@ -16,11 +16,11 @@ export function getPropertyNames(object: object, keys = new Set()) {
 /** Map function like for arrays, but for objects */
 export function objectMap<T extends object>(
   object: T,
-  function_: (key: keyof T, value: T[keyof T]) => [string, unknown],
+  run: (key: keyof T, value: T[keyof T]) => [string, unknown],
 ) {
   return Object.fromEntries(
     Object.entries(object).map(([key, value]) =>
-      function_(key as keyof T, value as T[keyof T]),
+      run(key as keyof T, value as T[keyof T]),
     ),
   )
 }
@@ -28,11 +28,11 @@ export function objectMap<T extends object>(
 /** Filter function like for arrays, but for objects */
 export function objectFilter<T extends object>(
   object: T,
-  function_: (key: keyof T, value: T[keyof T]) => unknown,
+  run: (key: keyof T, value: T[keyof T]) => unknown,
 ) {
   return Object.fromEntries(
     Object.entries(object).filter(([key, value]) =>
-      function_(key as keyof T, value as T[keyof T]),
+      run(key as keyof T, value as T[keyof T]),
     ),
   )
 }
@@ -158,9 +158,15 @@ export function pick<T extends object, K extends keyof T>(
  * ```
  */
 export class Base {
+  /** Id of last AUTOMATICALLY created object id */
   public static lastId = 0
+  /** Map of class instances by they ids */
   public static idMap = new Map<number, Base>()
+  /** Map of subclasses of base class by their name */
   public static subclasses = new Map<string, Constructor<Base>>()
+
+  /** Functions in this array will be run on instance destroy */
+  public runOnDestroy: AnyFunction[] = []
 
   private _id: number
   public get id() {
@@ -177,7 +183,43 @@ export class Base {
     Base.idMap.set(id, this)
   }
 
+  /**
+   * Include next lines when extending this class:
+   * ```js
+   * static {
+   *   this.registerSubclass()
+   * }
+   * ```
+   */
   public static registerSubclass() {
     Base.subclasses.set(this.name, this)
+  }
+
+  /**
+   * Destroy instance. Will run all `runOnDestroy` functions
+   * and remove istance from idMap.
+   * If class is garbage collected automatically runs this.
+   * */
+  public destroy() {
+    Base.idMap.delete(this._id)
+    for (let index = 0; index < this.runOnDestroy.length; index++)
+      this.runOnDestroy[index]!()
+  }
+
+  /**
+   * Register autocleared event handler.
+   * If using classes methods don't forget to `bind(this)`
+   */
+  protected registerEvent(
+    target: EventTarget,
+    type: string,
+    listener: EventListener,
+    options: AddEventListenerOptions = {},
+  ): void {
+    options.passive ??= true
+    target.addEventListener(type, listener, options)
+    this.runOnDestroy.push(() => {
+      target.removeEventListener(type, listener)
+    })
   }
 }

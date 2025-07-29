@@ -29,11 +29,11 @@ describe('signal', () => {
 describe('effect', () => {
   it('should run effect on signal change', () => {
     const $name = signal('Alice')
-    const function_ = mock(() => $name())
-    effect(function_)
-    expect(function_).toHaveBeenCalledTimes(1)
+    const run = mock(() => $name())
+    effect(run)
+    expect(run).toHaveBeenCalledTimes(1)
     $name('Bob')
-    expect(function_).toHaveBeenCalledTimes(2)
+    expect(run).toHaveBeenCalledTimes(2)
   })
 
   it('should pass previous value to effect', () => {
@@ -51,13 +51,13 @@ describe('effect', () => {
 
   it('should stop reacting after cleanup', () => {
     const $a = signal(1)
-    const function_ = mock(() => $a())
-    const stop = effect(function_)
+    const run = mock(() => $a())
+    const stop = effect(run)
     $a(2)
-    expect(function_).toHaveBeenCalledTimes(2)
+    expect(run).toHaveBeenCalledTimes(2)
     stop()
     $a(3)
-    expect(function_).toHaveBeenCalledTimes(2) // no extra call
+    expect(run).toHaveBeenCalledTimes(2) // no extra call
   })
 })
 
@@ -66,17 +66,17 @@ describe('untrack', () => {
     const $a = signal(1)
     const $b = signal(2)
     let sum = 0
-    const function_ = mock(() => {
+    const run = mock(() => {
       sum = untrack($a) + $b()
     })
-    effect(function_)
-    expect(function_).toHaveBeenCalledTimes(1)
+    effect(run)
+    expect(run).toHaveBeenCalledTimes(1)
     expect(sum).toBe(3)
     $a(10)
-    expect(function_).toHaveBeenCalledTimes(1) // $a is untracked
+    expect(run).toHaveBeenCalledTimes(1) // $a is untracked
     expect(sum).toBe(3)
     $b(5)
-    expect(function_).toHaveBeenCalledTimes(2)
+    expect(run).toHaveBeenCalledTimes(2)
     expect(sum).toBe(15)
   })
 })

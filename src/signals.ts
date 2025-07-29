@@ -33,9 +33,9 @@ export function signal<T>(): Signal<T | undefined>
 export function signal<T>(value: T): Signal<T>
 export function signal<T>(value?: T): Signal<T | undefined> {
   const subscribers = new Set<AnyFunction>()
-  return (...arguments_) => {
-    if (arguments_.length === 1) {
-      const argument = arguments_[0]
+  return (...data) => {
+    if (data.length === 1) {
+      const argument = data[0]
       value =
         typeof argument === 'function'
           ? (argument as (previous: T | undefined) => T)(value)
@@ -71,7 +71,7 @@ function clearEffect(handler: AnyFunction) {
  * Returned data from handler function will be passed to it on next signal change.
  * Returns a function that will clear the effect.
  *
- * ```ts
+ *
  * // Will print signal on change
  * effect(()=>{
  *   console.log($mySignal())
@@ -82,7 +82,6 @@ function clearEffect(handler: AnyFunction) {
  *   if(last>mySignal) console.log('Increment!')
  *   return mySignal;
  * })
- * ```
  */
 export function effect<T>(
   handler: (argument: T | undefined) => T,

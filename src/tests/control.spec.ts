@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, mock } from 'bun:test'
 
 import deepPromiseAll, {
   ImmediatePromise,
+  Semaphore,
   SimpleEventSource,
   UUID,
   concurrentRun,
@@ -14,7 +15,9 @@ import deepPromiseAll, {
   extractUUIDDate,
   noop,
   retry,
+  timeout,
   wait,
+  withTimeout,
 } from '../control'
 
 describe('UUID', () => {
@@ -43,11 +46,11 @@ describe('UUID', () => {
 describe('createCashedFunction', () => {
   it('caches function results', () => {
     let calls = 0
-    const function_ = (x: number) => {
+    const run = (x: number) => {
       calls++
       return x * 2
     }
-    const [cachedFunction] = createCashedFunction(function_)
+    const [cachedFunction] = createCashedFunction(run)
     expect(cachedFunction(2)).toBe(4)
     expect(cachedFunction(2)).toBe(4)
     expect(calls).toBe(1)
@@ -57,11 +60,11 @@ describe('createCashedFunction', () => {
 describe('createCashedAsyncFunction', () => {
   it('caches async function results', async () => {
     let calls = 0
-    const function_ = (x: number) => {
+    const run = (x: number) => {
       calls++
       return Promise.resolve(x * 2)
     }
-    const [cachedFunction] = createCashedAsyncFunction(function_)
+    const [cachedFunction] = createCashedAsyncFunction(run)
     expect(await cachedFunction(2)).toBe(4)
     expect(await cachedFunction(10)).toBe(20)
     expect(await cachedFunction(2)).toBe(4)
@@ -72,63 +75,73 @@ describe('createCashedAsyncFunction', () => {
 describe('retry', () => {
   it('retries failing function and eventually succeeds', () => {
     let attempts = 0
-    const function_ = () => {
+    const run = () => {
       attempts++
       if (attempts < 3) throw new Error('Fail')
       return Promise.resolve('Success')
     }
-    expect(retry(function_, 5)).resolves.toBe('Success')
+    expect(retry(run, 5)).resolves.toBe('Success')
     attempts = 0
-    expect(retry(function_, 1)).rejects.toThrow('Fail')
+    expect(retry(run, 1)).rejects.toThrow('Fail')
   })
 })
 
 describe('createDebouncedFunction', () => {
   it('prevents frequent calls within debounce time', async () => {
-    const function_ = () => 'Called'
-    const debouncedFunction = createDebouncedFunction(function_, 100)
+    const run = () => 'Called'
+    const debouncedFunction = createDebouncedFunction(run, 100)
     expect(debouncedFunction).not.toThrow()
-    expect(debouncedFunction).toThrow('Debounced')
+    expect(debouncedFunction).toThrow(
+      'The operation is delayed and can not be executed now',
+    )
     await wait(100)
     expect(debouncedFunction).not.toThrow()
-    expect(debouncedFunction).toThrow('Debounced')
+    expect(debouncedFunction).toThrow(
+      'The operation is delayed and can not be executed now',
+    )
   })
 })
 
 describe('createThrottledFunction', () => {
   it('limits function calls within time window', async () => {
-    const function_ = () => 'Called'
-    const throttledFunction = createThrottledFunction(function_, 2, 100)
+    const run = () => 'Called'
+    const throttledFunction = createThrottledFunction(run, 2, 100)
     expect(throttledFunction).not.toThrow()
     expect(throttledFunction).not.toThrow()
-    expect(throttledFunction).toThrow('Throttled')
+    expect(throttledFunction).toThrow(
+      'The operation is delayed and can not be executed now',
+    )
     await wait(50)
-    expect(throttledFunction).toThrow('Throttled')
+    expect(throttledFunction).toThrow(
+      'The operation is delayed and can not be executed now',
+    )
     await wait(50)
     expect(throttledFunction).not.toThrow()
     expect(throttledFunction).not.toThrow()
-    expect(throttledFunction).toThrow('Throttled')
+    expect(throttledFunction).toThrow(
+      'The operation is delayed and can not be executed now',
+    )
   })
 })
 
 describe('createDelayedFunction', () => {
-  let function_ = mock(() => 'Called')
-  let throttledFunction = createDelayedFunction(function_, 100)
+  let run = mock(() => 'Called')
+  let throttledFunction = createDelayedFunction(run, 100)
   beforeEach(() => {
-    function_ = mock(() => 'Called')
-    throttledFunction = createDelayedFunction(function_, 100)
+    run = mock(() => 'Called')
+    throttledFunction = createDelayedFunction(run, 100)
   })
   it('delays function call', async () => {
     void throttledFunction()
-    expect(function_).not.toBeCalled()
+    expect(run).not.toBeCalled()
     await wait(100)
-    expect(function_).toBeCalled()
+    expect(run).toBeCalled()
   })
   it('do not call multiple times', async () => {
     void throttledFunction()
     void throttledFunction()
     await wait(100)
-    expect(function_).toBeCalledTimes(1)
+    expect(run).toBeCalledTimes(1)
   })
   it('promise is correct', async () => {
     await Promise.all([
@@ -136,7 +149,7 @@ describe('createDelayedFunction', () => {
       throttledFunction(),
       throttledFunction(),
     ])
-    expect(function_).toBeCalledTimes(1)
+    expect(run).toBeCalledTimes(1)
   })
 })
 
@@ -261,7 +274,7 @@ describe('concurrentRun', () => {
       return running
     })
     await concurrentRun(tasks, 2)
-    expect(maxRunning).toBeLessThanOrEqual(2) // Ensure concurrency limit is respected
+    expect(maxRunning).toBe(2) // Ensure concurrency limit is respected
   })
 })
 
@@ -319,5 +332,109 @@ describe('SimpleEventSource', () => {
     expect(h1).toHaveBeenCalledTimes(1)
     expect(h2).toHaveBeenCalledWith(10)
     expect(h2).toHaveBeenCalledTimes(2)
+  })
+  it('source scoped functions', () => {
+    source.off('count', h1)
+    const s = source.source
+    s.on('count', h1)
+    source.send('count', 10)
+    s.off('count', h1)
+    source.send('count', 15)
+    expect(h1).toHaveBeenCalledWith(10)
+    expect(h1).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('Semaphore', () => {
+  it('runs tasks concurrently with the given limit', async () => {
+    let concurrency = 0
+    let maxConcurrency = 0
+    const semaphore = new Semaphore(2)
+    const startTime = performance.now()
+    const startTimes: number[] = []
+    const delays = [100, 50, 150, 50, 10] // Different delays to test concurrency
+    const results = await Promise.all(
+      delays.map(async (delay, index) => {
+        await semaphore.acquire()
+        concurrency++
+        if (maxConcurrency < concurrency) maxConcurrency = concurrency
+        startTimes.push(Date.now())
+        try {
+          await wait(delay)
+          return index
+        } finally {
+          concurrency--
+          semaphore.release()
+        }
+      }),
+    )
+    expect(results).toEqual([0, 1, 2, 3, 4]) // Check if results match the order of tasks
+    expect(startTimes.length).toBe(delays.length)
+    // Check that concurrency never stops for max performance
+    expect(performance.now() - startTime).toBeWithin(200, 220)
+    expect(maxConcurrency).toBe(2)
+  })
+
+  it('runs tasks concurrently with the given limit with run()', async () => {
+    let concurrency = 0
+    let maxConcurrency = 0
+    const semaphore = new Semaphore(2)
+    const startTime = performance.now()
+    const startTimes: number[] = []
+    const delays = [100, 50, 150, 50, 10] // Different delays to test concurrency
+    const results = await Promise.all(
+      delays.map((delay, index) =>
+        semaphore.run(
+          () =>
+            new Promise<number>((resolve) => {
+              concurrency++
+              if (maxConcurrency < concurrency) maxConcurrency = concurrency
+              startTimes.push(Date.now())
+              setTimeout(() => {
+                concurrency--
+                resolve(index)
+              }, delay)
+            }),
+        ),
+      ),
+    )
+    expect(results).toEqual([0, 1, 2, 3, 4]) // Check if results match the order of tasks
+    expect(startTimes.length).toBe(delays.length)
+    // Check that concurrency never stops for max performance
+    expect(performance.now() - startTime).toBeWithin(200, 220)
+    expect(maxConcurrency).toBe(2)
+  })
+})
+
+describe('withTimeout', () => {
+  it('resolves if the promise finishes before timeout', async () => {
+    const result = await withTimeout(() => Promise.resolve('ok'), 100)
+    expect(result).toBe('ok')
+  })
+
+  it('rejects if the promise takes longer than the timeout', () => {
+    expect(
+      withTimeout(
+        () =>
+          new Promise((resolve) =>
+            setTimeout(() => {
+              resolve('too late')
+            }, 200),
+          ),
+        50,
+      ),
+    ).rejects.toThrow('The operation has timed out')
+  })
+
+  it('propagates errors from the run function', () => {
+    expect(
+      withTimeout(() => Promise.reject(new Error('Original error')), 100),
+    ).rejects.toThrow('Original error')
+  })
+})
+
+describe('timeout', () => {
+  it('returns a reason if a response is received after the specified wait time', () => {
+    expect(timeout(50)).rejects.toThrow('The operation has timed out')
   })
 })
