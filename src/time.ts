@@ -82,14 +82,21 @@ export function cronInterval(run: () => unknown, cronString: string) {
   }
 }
 
-/** Find next cron date after passed date.
+/** Find next cron date after passed date. This function __DOES NOT__ implement regular CRON 1 to 1.
  *
- *  This function __DOES NOT__ implement regular CRON 1 to 1.
+ *  1. [0-999] Milliseconds
+ *  2. [0-59] Seconds
+ *  3. [0-59] Minutes
+ *  4. [0-23] Hours
+ *  5. [1-31] Dates
+ *  6. [1-12] Months
+ *  7. [0-6] Weekdays
  *
  *  Main differences:
  *  - Weekdays value only 0 to 6 (0 is Sunday)
  *  - New supported syntax: __30-60/10__ - means __30,40,50,60__
- *  - Second and millisecond support: __* * * * * 30 999__ - executes every 30 seconds at the end of a second */
+ *  - Second and millisecond support: __0,500 300__ - every 30 seconds, two times
+ * */
 export function getNextCron(cronString: string, datetime = new Date()) {
   const cron = cronString.split(' ')
   for (let index = cron.length; index < 7; index++)
@@ -252,6 +259,7 @@ export class SpeedCalculator<SIZE extends number | undefined> {
           : {
               speed,
               percent: this.sum / this.size,
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-conversion
               eta: ~~((this.size - this.sum) / speed) * 1000,
             }
     }

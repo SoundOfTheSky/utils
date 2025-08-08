@@ -1,7 +1,15 @@
 // eslint-disable-next-line import-x/no-unresolved
 import { describe, expect, it } from 'bun:test'
 
-import { aStar, bfs, dfs, unfoldPathfindingResult } from '../graphs'
+import {
+  aStar,
+  bfs,
+  dfs,
+  knapsack,
+  tspHeldKarp,
+  tspHeldKarpPath,
+  unfoldPathfindingResult,
+} from '../graphs'
 
 const graph = {
   A: ['B', 'D'],
@@ -130,5 +138,193 @@ describe('unfoldPathfindingResult', () => {
       parents: new Map(),
     })
     expect(path).toEqual([])
+  })
+})
+
+describe('knapsack', () => {
+  it('simple case', () => {
+    const weights = [1, 2, 3]
+    const values = [6, 10, 12]
+    const capacity = 5
+    const result = knapsack(weights, values, capacity)
+
+    expect(result.weight).toBe(22)
+    expect(result.items).toEqual([1, 2]) // weights: [2, 3], values: [10, 12]
+  })
+
+  it('zero capacity', () => {
+    const result = knapsack([1, 2, 3], [6, 10, 12], 0)
+    expect(result.weight).toBe(0)
+    expect(result.items).toEqual([])
+  })
+
+  it('no items', () => {
+    const result = knapsack([], [], 10)
+    expect(result.weight).toBe(0)
+    expect(result.items).toEqual([])
+  })
+
+  it('all items too heavy', () => {
+    const weights = [10, 20, 30]
+    const values = [60, 100, 120]
+    const capacity = 5
+    const result = knapsack(weights, values, capacity)
+
+    expect(result.weight).toBe(0)
+    expect(result.items).toEqual([])
+  })
+
+  it('capacity equals one item', () => {
+    const weights = [3, 5, 9]
+    const values = [10, 50, 60]
+    const capacity = 5
+    const result = knapsack(weights, values, capacity)
+
+    expect(result.weight).toBe(50)
+    expect(result.items).toEqual([1])
+  })
+
+  it('chooses better combo over single high value', () => {
+    const weights = [3, 5, 6]
+    const values = [30, 50, 60]
+    const capacity = 8
+    const result = knapsack(weights, values, capacity)
+
+    // Best is [1, 0] (values 50 + 30 = 80)
+    expect(result.weight).toBe(80)
+    expect(result.items).toEqual([0, 1])
+  })
+
+  it('handles large input', () => {
+    const n = 100
+    const weights = Array.from({ length: n }, (_, index) => index + 1)
+    const values = Array.from({ length: n }, (_, index) => (index + 1) * 2)
+    const capacity = 100
+    const result = knapsack(weights, values, capacity)
+
+    expect(result.weight).toBeGreaterThan(0)
+    expect(result.items.every((index) => weights[index]! <= capacity)).toBe(
+      true,
+    )
+  })
+})
+
+describe('held-karp', () => {
+  it('handles a degenerate case with 1 city', () => {
+    expect(tspHeldKarp([[0]])).toEqual({ distance: 0, path: [0, 0] })
+  })
+
+  it('handles a symmetric case with two cities', () => {
+    expect(
+      tspHeldKarp([
+        [0, 5],
+        [5, 0],
+      ]),
+    ).toEqual({ distance: 10, path: [0, 1, 0] })
+  })
+
+  it('handles an asymmetric case with two cities', () => {
+    expect(
+      tspHeldKarp([
+        [0, 7],
+        [6, 0],
+      ]),
+    ).toEqual({ distance: 13, path: [0, 1, 0] })
+  })
+
+  it('handles a case with two cities disconnected from one another, with no cycle possible', () => {
+    expect(
+      tspHeldKarp([
+        [0, Infinity],
+        [Infinity, 0],
+      ]),
+    ).toEqual({ distance: Infinity, path: [0, 1, 0] })
+  })
+
+  it('handles a symmetric case with three cities', () => {
+    expect(
+      tspHeldKarp([
+        [0, 1, 65],
+        [1, 0, 2],
+        [65, 2, 0],
+      ]),
+    ).toEqual({ distance: 68, path: [0, 2, 1, 0] })
+  })
+
+  it('handles an asymmetric case with three cities', () => {
+    expect(
+      tspHeldKarp([
+        [0, 1, 60],
+        [60, 0, 1],
+        [1, 60, 0],
+      ]),
+    ).toEqual({ distance: 3, path: [0, 1, 2, 0] })
+    expect(
+      tspHeldKarp([
+        [0, 60, 1],
+        [1, 0, 60],
+        [60, 1, 0],
+      ]),
+    ).toEqual({ distance: 3, path: [0, 2, 1, 0] })
+  })
+
+  it('example from https://www.geeksforgeeks.org/traveling-salesman-problem-tsp-implementation/', () => {
+    expect(
+      tspHeldKarp([
+        [0, 10, 15, 20],
+        [10, 0, 35, 25],
+        [15, 35, 0, 30],
+        [20, 25, 30, 0],
+      ]),
+    ).toEqual({ distance: 80, path: [0, 1, 3, 2, 0] })
+  })
+
+  it('asymmetric four-city case', () => {
+    expect(
+      tspHeldKarp([
+        [0, 1, 60, 60],
+        [60, 0, 1, 60],
+        [60, 60, 0, 1],
+        [1, 60, 60, 0],
+      ]),
+    ).toEqual({ distance: 4, path: [0, 1, 2, 3, 0] })
+  })
+
+  it('example from https://stackoverflow.com/a/64795748 (n = 6)', () => {
+    expect(
+      tspHeldKarp([
+        [0, 64, 378, 519, 434, 200],
+        [64, 0, 318, 455, 375, 164],
+        [378, 318, 0, 170, 265, 344],
+        [519, 455, 170, 0, 223, 428],
+        [434, 375, 265, 223, 0, 273],
+        [200, 164, 344, 428, 273, 0],
+      ]),
+    ).toEqual({ distance: 1248, path: [0, 5, 4, 3, 2, 1, 0] })
+  })
+
+  it('example from https://stackoverflow.com/a/27195735 (n = 11)', () => {
+    const cities = [
+      [0, 29, 20, 21, 16, 31, 100, 12, 4, 31, 18],
+      [29, 0, 15, 29, 28, 40, 72, 21, 29, 41, 12],
+      [20, 15, 0, 15, 14, 25, 81, 9, 23, 27, 13],
+      [21, 29, 15, 0, 4, 12, 92, 12, 25, 13, 25],
+      [16, 28, 14, 4, 0, 16, 94, 9, 20, 16, 22],
+      [31, 40, 25, 12, 16, 0, 95, 24, 36, 3, 37],
+      [100, 72, 81, 92, 94, 95, 0, 90, 101, 99, 84],
+      [12, 21, 9, 12, 9, 24, 90, 0, 15, 25, 13],
+      [4, 29, 23, 25, 20, 36, 101, 15, 0, 35, 18],
+      [31, 41, 27, 13, 16, 3, 99, 25, 35, 0, 38],
+      [18, 12, 13, 25, 22, 37, 84, 13, 18, 38, 0],
+    ]
+
+    expect(tspHeldKarp(cities)).toEqual({
+      distance: 253,
+      path: [0, 7, 4, 3, 9, 5, 2, 6, 1, 10, 8, 0],
+    })
+    expect(tspHeldKarpPath(cities)).toEqual({
+      distance: 160,
+      path: [6, 1, 10, 2, 7, 8, 0, 4, 3, 5, 9],
+    })
   })
 })

@@ -292,6 +292,19 @@ Returns a target and map of parents.
 You can use `unfoldPathfindingResult()` to get array of nodes.
 
 ---
+__function__ `knapsack` - Knapsack find best way to get maximum value in limited capacity
+
+---
+__function__ `tspHeldKarp` - Find min path between points. You need to supply 2-dim array
+where first index is a point and second index is a distance from this point to another.
+Put infinity if where are no path. Returns cycle (start and end at the same point)
+Original: https://github.com/qntm/held-karp
+
+---
+__function__ `tspHeldKarpPath` - Look for description of `tspHeldKarp`.
+Returns path without cycle
+
+---
 
 
 ## Numbers
@@ -505,14 +518,20 @@ Returns clear function.
 For cron string syntax check __getNextCron()__ description
 
 ---
-__function__ `getNextCron` - Find next cron date after passed date.
+__function__ `getNextCron` - Find next cron date after passed date. This function __DOES NOT__ implement regular CRON 1 to 1.
 
-This function __DOES NOT__ implement regular CRON 1 to 1.
+1. [0-999] Milliseconds
+2. [0-59] Seconds
+3. [0-59] Minutes
+4. [0-23] Hours
+5. [1-31] Dates
+6. [1-12] Months
+7. [0-6] Weekdays
 
 Main differences:
 - Weekdays value only 0 to 6 (0 is Sunday)
 - New supported syntax: __30-60/10__ - means __30,40,50,60__
-- Second and millisecond support: __* * * * * 30 999__ - executes every 30 seconds at the end of a second
+- Second and millisecond support: __0,500 300__ - every 30 seconds, two times
 
 ---
 __class__ `SpeedCalculator` - Object that calculates speed, ETA and percent of any measurable task.
