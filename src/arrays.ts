@@ -146,3 +146,15 @@ export function removeLastFromArray<T>(array: T[], value: T): number {
   if (index !== -1) array.splice(index, 1)
   return index
 }
+
+/** Reverse part of array */
+export function reverse<T>(array: T[], start: number, end: number): T[] {
+  array = [...array]
+  const n = ((end - start + 1) / 2) | 0
+  for (let index = 0; index < n; index++) {
+    const temporary = array[start + index]!
+    array[start + index] = array[end - index]!
+    array[end - index] = temporary
+  }
+  return array
+}

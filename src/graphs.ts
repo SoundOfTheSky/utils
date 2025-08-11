@@ -198,9 +198,9 @@ export function knapsack(
  * Put infinity if where are no path. Returns cycle (start and end at the same point)
  * Original: https://github.com/qntm/held-karp
  */
-export function tspHeldKarp(distribution: number[][]) {
+export function hamiltonianCycle(distribution: number[][]): number[] {
   const n = distribution.length
-  if (n === 1) return { distance: 0, path: [0, 0] }
+  if (n === 1) return [0, 0]
   const all = (1 << (n - 1)) - 1
   const length = new Float64Array((1 << (n - 1)) * (n - 1))
   const previous = new Uint8Array((1 << (n - 1)) * (n - 1))
@@ -260,25 +260,66 @@ export function tspHeldKarp(distribution: number[][]) {
   }
 
   const index = cycle.indexOf(0)
-  return {
-    distance: cycle.reduce(
-      (accumulator, u, index_, cycle) =>
-        accumulator +
-        distribution[u]![cycle[index_ + 1 in cycle ? index_ + 1 : 0]!]!,
-      0,
-    ),
-    path: [...cycle.slice(index), ...cycle.slice(0, index), 0],
-  }
+  return [...cycle.slice(index), ...cycle.slice(0, index), 0]
 }
 
 /**
- * Look for description of `tspHeldKarp`.
- * Returns path without cycle
+ * Traverse all points by nearest neighbor. Should be able to go from any point to any other point.
  */
-export function tspHeldKarpPath(d: number[][]) {
-  const { distance, path } = tspHeldKarp([
-    [0, ...(new Array(d.length).fill(0) as number[])],
-    ...d.map((d2) => [0, ...d2]),
-  ])
-  return { distance, path: path.slice(1, -1).map((u) => u - 1) }
+export function traverseByNearestNeighbor(distribution: number[][]): number[] {
+  const n = distribution.length
+  const toVisit = new Array(n).fill(true)
+  const path = [0]
+  let last = 0
+  toVisit[0] = false
+  for (let index = 1; index < n; index++) {
+    let nearest = -1
+    let nearestDistribution = Infinity
+    for (let index = 0; index < n; index++) {
+      if (toVisit[index] && distribution[last]![index]! < nearestDistribution) {
+        nearest = index
+        nearestDistribution = distribution[last]![index]!
+      }
+    }
+    path.push(nearest)
+    last = nearest
+    toVisit[nearest] = false
+  }
+
+  return path
+}
+
+/** 2-opt improvement */
+export function twoOpt(tour: number[], distribution: number[][]): number[] {
+  let improved = true
+  const nStart = tour.length - 2
+  const nEnd = tour.length - 1
+  while (improved) {
+    improved = false
+    for (let start = 1; start < nStart; start++) {
+      for (let end = start + 1; end < nEnd; end++) {
+        const t0 = distribution[tour[start - 1]!]!
+        const t1 = tour[start]!
+        const tk1 = tour[end]!
+        const tk2 = tour[end + 1]!
+        if (
+          t0[tk1]! +
+            distribution[t1]![tk2]! -
+            t0[t1]! -
+            distribution[tk1]![tk2]! <
+          -1e-9
+        ) {
+          const n = ((end - start + 1) / 2) | 0
+          for (let index = 0; index < n; index++) {
+            const temporary = tour[start + index]!
+            tour[start + index] = tour[end - index]!
+            tour[end - index] = temporary
+          }
+          improved = true
+        }
+      }
+    }
+  }
+
+  return tour
 }

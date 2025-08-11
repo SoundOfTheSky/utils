@@ -85,6 +85,9 @@ Only deletes last encountered.
 Returns index of deleted value.
 
 ---
+__function__ `reverse` - Reverse part of array
+
+---
 
 
 ## Consts
@@ -295,14 +298,16 @@ You can use `unfoldPathfindingResult()` to get array of nodes.
 __function__ `knapsack` - Knapsack find best way to get maximum value in limited capacity
 
 ---
-__function__ `tspHeldKarp` - Find min path between points. You need to supply 2-dim array
+__function__ `hamiltonianCycle` - Find min path between points. You need to supply 2-dim array
 where first index is a point and second index is a distance from this point to another.
 Put infinity if where are no path. Returns cycle (start and end at the same point)
 Original: https://github.com/qntm/held-karp
 
 ---
-__function__ `tspHeldKarpPath` - Look for description of `tspHeldKarp`.
-Returns path without cycle
+__function__ `traverseByNearestNeighbor` - Traverse all points by nearest neighbor. Should be able to go from any point to any other point.
+
+---
+__function__ `twoOpt` - 2-opt improvement
 
 ---
 

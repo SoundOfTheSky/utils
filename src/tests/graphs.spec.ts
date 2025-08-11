@@ -6,8 +6,7 @@ import {
   bfs,
   dfs,
   knapsack,
-  tspHeldKarp,
-  tspHeldKarpPath,
+  hamiltonianCycle,
   unfoldPathfindingResult,
 } from '../graphs'
 
@@ -211,88 +210,88 @@ describe('knapsack', () => {
 
 describe('held-karp', () => {
   it('handles a degenerate case with 1 city', () => {
-    expect(tspHeldKarp([[0]])).toEqual({ distance: 0, path: [0, 0] })
+    expect(hamiltonianCycle([[0]])).toEqual([0, 0])
   })
 
   it('handles a symmetric case with two cities', () => {
     expect(
-      tspHeldKarp([
+      hamiltonianCycle([
         [0, 5],
         [5, 0],
       ]),
-    ).toEqual({ distance: 10, path: [0, 1, 0] })
+    ).toEqual([0, 1, 0])
   })
 
   it('handles an asymmetric case with two cities', () => {
     expect(
-      tspHeldKarp([
+      hamiltonianCycle([
         [0, 7],
         [6, 0],
       ]),
-    ).toEqual({ distance: 13, path: [0, 1, 0] })
+    ).toEqual([0, 1, 0])
   })
 
   it('handles a case with two cities disconnected from one another, with no cycle possible', () => {
     expect(
-      tspHeldKarp([
+      hamiltonianCycle([
         [0, Infinity],
         [Infinity, 0],
       ]),
-    ).toEqual({ distance: Infinity, path: [0, 1, 0] })
+    ).toEqual([0, 1, 0])
   })
 
   it('handles a symmetric case with three cities', () => {
     expect(
-      tspHeldKarp([
+      hamiltonianCycle([
         [0, 1, 65],
         [1, 0, 2],
         [65, 2, 0],
       ]),
-    ).toEqual({ distance: 68, path: [0, 2, 1, 0] })
+    ).toEqual([0, 2, 1, 0])
   })
 
   it('handles an asymmetric case with three cities', () => {
     expect(
-      tspHeldKarp([
+      hamiltonianCycle([
         [0, 1, 60],
         [60, 0, 1],
         [1, 60, 0],
       ]),
-    ).toEqual({ distance: 3, path: [0, 1, 2, 0] })
+    ).toEqual([0, 1, 2, 0])
     expect(
-      tspHeldKarp([
+      hamiltonianCycle([
         [0, 60, 1],
         [1, 0, 60],
         [60, 1, 0],
       ]),
-    ).toEqual({ distance: 3, path: [0, 2, 1, 0] })
+    ).toEqual([0, 2, 1, 0])
   })
 
   it('example from https://www.geeksforgeeks.org/traveling-salesman-problem-tsp-implementation/', () => {
     expect(
-      tspHeldKarp([
+      hamiltonianCycle([
         [0, 10, 15, 20],
         [10, 0, 35, 25],
         [15, 35, 0, 30],
         [20, 25, 30, 0],
       ]),
-    ).toEqual({ distance: 80, path: [0, 1, 3, 2, 0] })
+    ).toEqual([0, 1, 3, 2, 0])
   })
 
   it('asymmetric four-city case', () => {
     expect(
-      tspHeldKarp([
+      hamiltonianCycle([
         [0, 1, 60, 60],
         [60, 0, 1, 60],
         [60, 60, 0, 1],
         [1, 60, 60, 0],
       ]),
-    ).toEqual({ distance: 4, path: [0, 1, 2, 3, 0] })
+    ).toEqual([0, 1, 2, 3, 0])
   })
 
   it('example from https://stackoverflow.com/a/64795748 (n = 6)', () => {
     expect(
-      tspHeldKarp([
+      hamiltonianCycle([
         [0, 64, 378, 519, 434, 200],
         [64, 0, 318, 455, 375, 164],
         [378, 318, 0, 170, 265, 344],
@@ -300,7 +299,7 @@ describe('held-karp', () => {
         [434, 375, 265, 223, 0, 273],
         [200, 164, 344, 428, 273, 0],
       ]),
-    ).toEqual({ distance: 1248, path: [0, 5, 4, 3, 2, 1, 0] })
+    ).toEqual([0, 5, 4, 3, 2, 1, 0])
   })
 
   it('example from https://stackoverflow.com/a/27195735 (n = 11)', () => {
@@ -318,13 +317,8 @@ describe('held-karp', () => {
       [18, 12, 13, 25, 22, 37, 84, 13, 18, 38, 0],
     ]
 
-    expect(tspHeldKarp(cities)).toEqual({
-      distance: 253,
-      path: [0, 7, 4, 3, 9, 5, 2, 6, 1, 10, 8, 0],
-    })
-    expect(tspHeldKarpPath(cities)).toEqual({
-      distance: 160,
-      path: [6, 1, 10, 2, 7, 8, 0, 4, 3, 5, 9],
-    })
+    expect(hamiltonianCycle(cities)).toEqual([
+      0, 7, 4, 3, 9, 5, 2, 6, 1, 10, 8, 0,
+    ])
   })
 })
