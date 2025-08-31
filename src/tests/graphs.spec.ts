@@ -8,6 +8,8 @@ import {
   knapsack,
   hamiltonianCycle,
   unfoldPathfindingResult,
+  twoOpt,
+  traverseByNearestNeighbor,
 } from '../graphs'
 
 const graph = {
@@ -320,5 +322,139 @@ describe('held-karp', () => {
     expect(hamiltonianCycle(cities)).toEqual([
       0, 7, 4, 3, 9, 5, 2, 6, 1, 10, 8, 0,
     ])
+  })
+})
+
+function distributionMatrix(points: [number, number][]): number[][] {
+  const n = points.length
+  const distribution = Array.from(
+    { length: n },
+    () => new Array(n).fill(0) as number[],
+  )
+  for (let index = 0; index < n; index++) {
+    for (let index_ = 0; index_ < n; index_++) {
+      const dx = points[index]![0] - points[index_]![0]
+      const dy = points[index]![1] - points[index_]![1]
+      distribution[index]![index_] = Math.hypot(dx, dy)
+    }
+  }
+  return distribution
+}
+
+describe('traverseByNearestNeighbor', () => {
+  it('visits all points exactly once', () => {
+    const points: [number, number][] = [
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [1, 1],
+    ]
+    const path = traverseByNearestNeighbor(distributionMatrix(points))
+    expect(new Set(path).size).toBe(points.length)
+    expect(path.length).toBe(points.length)
+    expect(path[0]).toBe(0) // always starts at 0
+  })
+
+  it('chooses nearest neighbor in a straight line', () => {
+    expect(
+      traverseByNearestNeighbor(
+        distributionMatrix([
+          [0, 0],
+          [1, 0],
+          [2, 0],
+          [3, 0],
+        ]),
+      ),
+    ).toEqual([0, 1, 2, 3])
+  })
+
+  it('works with asymmetric distance matrix', () => {
+    expect(
+      traverseByNearestNeighbor([
+        [0, 1, 5],
+        [2, 0, 1],
+        [1, 3, 0],
+      ]),
+    ).toEqual([0, 1, 2])
+  })
+
+  it('returns [0] for a single node', () => {
+    expect(traverseByNearestNeighbor([[0]])).toEqual([0])
+  })
+
+  it('returns [0,1] for two nodes', () => {
+    expect(
+      traverseByNearestNeighbor([
+        [0, 2],
+        [2, 0],
+      ]),
+    ).toEqual([0, 1])
+  })
+})
+
+describe('twoOpt', () => {
+  function tourLength(tour: number[], distribution: number[][]): number {
+    let length = 0
+    for (let index = 0; index < tour.length - 1; index++)
+      length += distribution[tour[index]!]![tour[index + 1]!]!
+    return length
+  }
+
+  it('improves a simple square tour', () => {
+    const distribution = distributionMatrix([
+      [0, 0],
+      [1, 0],
+      [1, 1],
+      [0, 1],
+    ])
+    // suboptimal tour (crossing edges): 0 > 1 > 3 > 2 > 0
+    const tour = [0, 1, 3, 2, 0]
+    const initialLength = tourLength(tour, distribution)
+    const improvedTour = twoOpt([...tour], distribution)
+    const improvedLength = tourLength(improvedTour, distribution)
+    expect(improvedLength).toBeLessThan(initialLength)
+    // optimal should be ~4.0 (square perimeter)
+    expect(improvedLength).toBeCloseTo(4, 5)
+  })
+
+  it('leaves already optimal tour unchanged (or equivalent)', () => {
+    const distribution = distributionMatrix([
+      [0, 0],
+      [1, 0],
+      [1, 1],
+      [0, 1],
+    ])
+    const optimalTour = [0, 1, 2, 3, 0]
+    const result = twoOpt([...optimalTour], distribution)
+    expect(tourLength(result, distribution)).toBeCloseTo(
+      tourLength(optimalTour, distribution),
+      5,
+    )
+  })
+
+  it('works with a triangle (minimal tour)', () => {
+    const distribution = distributionMatrix([
+      [0, 0],
+      [1, 0],
+      [0, 1],
+    ])
+    const tour = [0, 1, 2, 0]
+    const result = twoOpt([...tour], distribution)
+    // Should be same, as triangle has no crossing edges
+    expect(result).toEqual(tour)
+  })
+
+  it('preserves the same set of nodes in the tour', () => {
+    const points: [number, number][] = [
+      [0, 0],
+      [2, 0],
+      [2, 2],
+      [0, 2],
+    ]
+    const distribution = distributionMatrix(points)
+    const tour = [0, 2, 1, 3, 0] // deliberately scrambled
+    const result = twoOpt([...tour], distribution)
+    // Same multiset of nodes
+    expect([...result].sort()).toEqual([...tour].sort())
   })
 })

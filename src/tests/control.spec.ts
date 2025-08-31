@@ -14,6 +14,8 @@ import deepPromiseAll, {
   createThrottledFunction,
   extractUUIDDate,
   noop,
+  promisify,
+  promisifyEventSource,
   retry,
   timeout,
   wait,
@@ -436,5 +438,82 @@ describe('withTimeout', () => {
 describe('timeout', () => {
   it('returns a reason if a response is received after the specified wait time', () => {
     expect(timeout(50)).rejects.toThrow('The operation has timed out')
+  })
+})
+
+describe('promisify', () => {
+  it('resolves with single value when callback returns one argument', () => {
+    const function_ = (x: number, callback: (result: number) => void) => {
+      callback(x * 2)
+    }
+
+    const promisified = promisify(function_)
+    expect(promisified(5)).resolves.toBe(10)
+  })
+
+  it('resolves with array when callback returns multiple arguments', () => {
+    const function_ = (
+      x: number,
+      y: number,
+      callback: (sum: number, diff: number) => void,
+    ) => {
+      callback(x + y, x - y)
+    }
+    const promisified = promisify(function_)
+    expect(promisified(7, 3)).resolves.toEqual([10, 4])
+  })
+
+  it('works with async callback functions', () => {
+    const function_ = (message: string, callback: (upper: string) => void) => {
+      setTimeout(() => {
+        callback(message.toUpperCase())
+      }, 10)
+    }
+    const promisified = promisify<[string], [string]>(function_)
+    expect(promisified('hello')).resolves.toBe('HELLO')
+  })
+})
+
+describe('promisifyEventSource', () => {
+  class MockEventSource {
+    public listeners: Record<string, ((event?: any) => void)[]> = {}
+    public addEventListener(event: string, handler: (event?: any) => void) {
+      this.listeners[event] ??= []
+      this.listeners[event].push(handler)
+    }
+    public trigger(event: string, detail?: any) {
+      for (const handler of this.listeners[event] ?? []) handler(detail)
+    }
+  }
+
+  it('resolves when a resolve event is triggered', () => {
+    const mock = new MockEventSource()
+    const promise = promisifyEventSource<string>(
+      mock as unknown as EventSource,
+      ['done'],
+    )
+    mock.trigger('done', 'finished!')
+    expect(promise).resolves.toBe('finished!')
+  })
+
+  it('rejects when a reject event is triggered', () => {
+    const mock = new MockEventSource()
+    const promise = promisifyEventSource<string>(
+      mock as unknown as EventSource,
+      ['success'],
+      ['fail'],
+    )
+    mock.trigger('fail', new Error('bad'))
+    expect(promise).rejects.toEqual(new Error('bad'))
+  })
+
+  it('listens to multiple resolve events', () => {
+    const mock = new MockEventSource()
+    const promise = promisifyEventSource<string>(
+      mock as unknown as EventSource,
+      ['a', 'b'],
+    )
+    mock.trigger('b', 'resolved via b')
+    expect(promise).resolves.toBe('resolved via b')
   })
 })

@@ -205,6 +205,12 @@ semaphore.run(()=>{
 __async function__ `withTimeout` - Add timeout to a promise
 
 ---
+__function__ `promisify` - Promisify a function with callback
+
+---
+__function__ `promisifyEventSource` - Create a promise out of EventSource
+
+---
 
 
 ## Errors

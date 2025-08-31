@@ -362,3 +362,30 @@ export async function withTimeout<T>(
 ): Promise<T> {
   return Promise.race([run(), timeout(ms)])
 }
+
+/** Promisify a function with callback */
+export function promisify<A extends any[], R extends any[]>(
+  handler: (...handlerArguments: [...A, (...results: R) => void]) => void,
+): (...handlerArguments: A) => Promise<R extends [infer U] ? U : R> {
+  return (...handlerArguments: A) =>
+    new Promise<any>((resolve) => {
+      handler(...handlerArguments, (...results) => {
+        resolve(results.length > 1 ? results : results[0])
+      })
+    })
+}
+
+/** Create a promise out of EventSource */
+export function promisifyEventSource<T = unknown>(
+  target: EventSource,
+  resolveEvents: string[],
+  rejectEvents: string[] = ['error'],
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    for (let index = 0; index < resolveEvents.length; index++)
+      // @ts-ignore
+      target.addEventListener(resolveEvents[index]!, resolve)
+    for (let index = 0; index < rejectEvents.length; index++)
+      target.addEventListener(rejectEvents[index]!, reject)
+  })
+}

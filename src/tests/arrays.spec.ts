@@ -10,6 +10,7 @@ import {
   randomFromArray,
   removeFromArray,
   removeLastFromArray,
+  reverse,
   shuffleArray,
   swap,
 } from '../arrays'
@@ -136,5 +137,34 @@ describe('removeFromArray', () => {
     expect(array).toEqual([1, 2, 3, 3, 1])
     expect(removeLastFromArray(array, Infinity)).toBe(-1)
     expect(array).toEqual([1, 2, 3, 3, 1])
+  })
+})
+
+describe('reverse', () => {
+  it('reverses a portion of an array in the middle', () => {
+    expect(reverse([1, 2, 3, 4, 5, 6], 1, 4)).toEqual([1, 5, 4, 3, 2, 6])
+  })
+
+  it('reverses the entire array', () => {
+    expect(reverse([1, 2, 3, 4], 0, 3)).toEqual([4, 3, 2, 1])
+  })
+
+  it('reverses a subarray at the beginning', () => {
+    expect(reverse([1, 2, 3, 4, 5], 0, 2)).toEqual([3, 2, 1, 4, 5])
+  })
+
+  it('reverses a subarray at the end', () => {
+    expect(reverse([10, 20, 30, 40, 50], 2, 4)).toEqual([10, 20, 50, 40, 30])
+  })
+
+  it('handles single element range (no change)', () => {
+    expect(reverse([1, 2, 3, 4], 2, 2)).toEqual([1, 2, 3, 4])
+  })
+
+  it('returns a new array (does not mutate original)', () => {
+    const array = [1, 2, 3, 4]
+    const result = reverse(array, 0, 3)
+    expect(array).toEqual([1, 2, 3, 4]) // unchanged
+    expect(result).toEqual([4, 3, 2, 1])
   })
 })

@@ -285,7 +285,6 @@ export function traverseByNearestNeighbor(distribution: number[][]): number[] {
     last = nearest
     toVisit[nearest] = false
   }
-
   return path
 }
 
