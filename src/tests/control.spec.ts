@@ -488,32 +488,34 @@ describe('promisifyEventSource', () => {
 
   it('resolves when a resolve event is triggered', () => {
     const mock = new MockEventSource()
-    const promise = promisifyEventSource<string>(
-      mock as unknown as EventSource,
-      ['done'],
-    )
+    const promise = promisifyEventSource(mock, ['done'])
     mock.trigger('done', 'finished!')
     expect(promise).resolves.toBe('finished!')
   })
 
   it('rejects when a reject event is triggered', () => {
     const mock = new MockEventSource()
-    const promise = promisifyEventSource<string>(
-      mock as unknown as EventSource,
-      ['success'],
-      ['fail'],
-    )
+    const promise = promisifyEventSource<string>(mock, ['success'], ['fail'])
     mock.trigger('fail', new Error('bad'))
     expect(promise).rejects.toEqual(new Error('bad'))
   })
 
   it('listens to multiple resolve events', () => {
     const mock = new MockEventSource()
-    const promise = promisifyEventSource<string>(
-      mock as unknown as EventSource,
-      ['a', 'b'],
-    )
+    const promise = promisifyEventSource<string>(mock, ['a', 'b'])
     mock.trigger('b', 'resolved via b')
+    expect(promise).resolves.toBe('resolved via b')
+  })
+
+  it('listens to multiple resolve events', () => {
+    const eventSource = new SimpleEventSource()
+    const promise = promisifyEventSource<string>(
+      eventSource,
+      ['a', 'b'],
+      ['error'],
+      'on',
+    )
+    eventSource.send('b', 'resolved via b')
     expect(promise).resolves.toBe('resolved via b')
   })
 })

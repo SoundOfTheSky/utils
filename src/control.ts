@@ -377,15 +377,19 @@ export function promisify<A extends any[], R extends any[]>(
 
 /** Create a promise out of EventSource */
 export function promisifyEventSource<T = unknown>(
-  target: EventSource,
+  target: object,
   resolveEvents: string[],
   rejectEvents: string[] = ['error'],
+  subName = 'addEventListener',
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     for (let index = 0; index < resolveEvents.length; index++)
       // @ts-ignore
-      target.addEventListener(resolveEvents[index]!, resolve)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      target[subName]?.(resolveEvents[index]!, resolve)
     for (let index = 0; index < rejectEvents.length; index++)
-      target.addEventListener(rejectEvents[index]!, reject)
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      target[subName]?.(rejectEvents[index]!, reject)
   })
 }
