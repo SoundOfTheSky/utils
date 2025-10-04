@@ -301,6 +301,12 @@ Returns a target and map of parents.
 You can use `unfoldPathfindingResult()` to get array of nodes.
 
 ---
+__function__ `dijkstra` - Dijkstra search. Like bfs but supports weight.
+If isTarget is omitted becomes floodfill (WITH WEIGHT).
+Returns a target and map of parents.
+You can use `unfoldPathfindingResult()` to get array of nodes.
+
+---
 __function__ `knapsack` - Knapsack find best way to get maximum value in limited capacity
 
 ---

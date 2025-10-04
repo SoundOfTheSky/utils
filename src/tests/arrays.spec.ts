@@ -46,7 +46,7 @@ describe('swap', () => {
 })
 
 describe('binarySearch', () => {
-  it('finds an element in a sorted array of number in one step', () => {
+  it('finds an element in a sorted array of numbers in one step', () => {
     const array = [10, 20, 30, 40, 50]
     let steps = 0
     const index = binarySearch(array.length, (index_) => {
@@ -56,19 +56,44 @@ describe('binarySearch', () => {
     expect(index).toBe(2)
     expect(steps).toBe(1)
   })
-  it('finds every element in array not more than in 3 steps', () => {
+
+  it('finds every element in array in ≤ 3 steps', () => {
     const array = ['abc', 'acc', 'bbc', 'cbc', 'dcb']
     const collator = Intl.Collator()
     for (let index = 0; index < array.length; index++) {
       const element = array[index]!
       let steps = 0
-      const found = binarySearch(array.length, (index) => {
+      const found = binarySearch(array.length, (index_) => {
         steps++
-        return collator.compare(array[index]!, element)
+        return collator.compare(array[index_]!, element)
       })
       expect(found).toBe(index)
       expect(steps).toBeLessThanOrEqual(3)
     }
+  })
+
+  it('returns insertion index for values not in array', () => {
+    const array = [10, 20, 30, 40, 50]
+    expect(binarySearch(array.length, (index) => array[index]! - 5, true)).toBe(
+      0,
+    ) // before first
+    expect(
+      binarySearch(array.length, (index) => array[index]! - 25, true),
+    ).toBe(2) // between 20 and 30
+    expect(
+      binarySearch(array.length, (index) => array[index]! - 35, true),
+    ).toBe(3) // between 30 and 40
+    expect(
+      binarySearch(array.length, (index) => array[index]! - 55, true),
+    ).toBe(5) // after last
+  })
+
+  it('returns 0 when array is empty and returnClosest = true', () => {
+    expect(binarySearch(0, () => 0, true)).toBe(0)
+  })
+
+  it('returns -1 when array is empty and returnClosest = false', () => {
+    expect(binarySearch(0, () => 0, false)).toBe(-1)
   })
 })
 
@@ -102,11 +127,10 @@ describe('permutations', () => {
 
 describe('pushToSorted', () => {
   it('inserts an element while maintaining sort order', () => {
-    const array = [1, 3, 5]
-    pushToSorted(array, 4, (element) => element - 4)
-    expect(array).toEqual([1, 3, 4, 5])
-    pushToSorted(array, 4, (element) => element - 4)
-    expect(array).toEqual([1, 3, 4, 4, 5])
+    const array = []
+    for (let n = 1; n < 8; n += 2) array.push(n) // 1 3 5 7
+    for (let n = 0; n < 9; n += 2) pushToSorted(array, n, (x) => x - n) // 0 2 4 6 8
+    expect(array).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8])
   })
 
   it('inserts an element if place not found', () => {
@@ -119,6 +143,12 @@ describe('pushToSorted', () => {
     const array: { data: number }[] = []
     pushToSorted(array, { data: 10 }, (element) => element.data - 10)
     expect(array).toEqual([{ data: 10 }])
+  })
+
+  it('inserts duplicates next to existing ones (stable order)', () => {
+    const array = [1, 2, 2, 3]
+    pushToSorted(array, 2, (x) => x - 2)
+    expect(array).toEqual([1, 2, 2, 2, 3])
   })
 })
 

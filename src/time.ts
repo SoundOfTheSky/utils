@@ -259,7 +259,7 @@ export class SpeedCalculator<SIZE extends number | undefined> {
           : {
               speed,
               percent: this.sum / this.size,
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-conversion
+
               eta: ~~((this.size - this.sum) / speed) * 1000,
             }
     }

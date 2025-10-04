@@ -52,7 +52,7 @@ export function binarySearch(
     else if (compared > 0) high = mid
     else low = mid + 1
   }
-  return returnClosest ? mid : -1
+  return returnClosest ? low : -1
 }
 
 /** Split array into sub arrays of spicified size */

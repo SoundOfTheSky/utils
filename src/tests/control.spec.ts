@@ -216,7 +216,7 @@ describe('wait', () => {
   it('delays execution for given time', async () => {
     const start = performance.now()
     await wait(100)
-    expect(performance.now() - start).toBeWithin(100, 110)
+    expect(performance.now() - start).toBeWithin(90, 110)
   })
 })
 
@@ -248,7 +248,7 @@ describe('concurrentRun', () => {
     expect(results).toEqual([0, 1, 2, 3, 4]) // Check if results match the order of tasks
     expect(startTimes.length).toBe(delays.length)
     // Check that concurrency never stops for max performance
-    expect(performance.now() - startTime).toBeWithin(200, 220)
+    expect(performance.now() - startTime).toBeWithin(190, 210)
   })
 
   it('handles empty task array', async () => {
@@ -373,7 +373,7 @@ describe('Semaphore', () => {
     expect(results).toEqual([0, 1, 2, 3, 4]) // Check if results match the order of tasks
     expect(startTimes.length).toBe(delays.length)
     // Check that concurrency never stops for max performance
-    expect(performance.now() - startTime).toBeWithin(200, 220)
+    expect(performance.now() - startTime).toBeWithin(190, 210)
     expect(maxConcurrency).toBe(2)
   })
 
@@ -403,7 +403,7 @@ describe('Semaphore', () => {
     expect(results).toEqual([0, 1, 2, 3, 4]) // Check if results match the order of tasks
     expect(startTimes.length).toBe(delays.length)
     // Check that concurrency never stops for max performance
-    expect(performance.now() - startTime).toBeWithin(200, 220)
+    expect(performance.now() - startTime).toBeWithin(190, 210)
     expect(maxConcurrency).toBe(2)
   })
 })

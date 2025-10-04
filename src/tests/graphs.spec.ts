@@ -10,6 +10,7 @@ import {
   unfoldPathfindingResult,
   twoOpt,
   traverseByNearestNeighbor,
+  dijkstra,
 } from '../graphs'
 
 const graph = {
@@ -83,6 +84,51 @@ describe('dfs', () => {
         }),
       ),
     )
+  })
+})
+
+describe('dijkstra', () => {
+  const costs: Record<string, number> = {
+    A: 0,
+    B: 5,
+    C: 1,
+    D: 4,
+    E: 1,
+    F: 10,
+  }
+
+  it('finds cheaper weighted path', () => {
+    const { target, parents } = dijkstra({
+      start: 'A',
+      getNeighbors,
+      isTarget: (node) => node === 'E',
+      getWeight: (node) => costs[node] ?? Infinity,
+    })
+    expect(target).toBe('E')
+    const path = unfoldPathfindingResult({ target, parents })
+    expect(path).toEqual(['A', 'D', 'E'])
+    ;(() => {
+      costs.D! += 2
+      const { target, parents } = dijkstra({
+        start: 'A',
+        getNeighbors,
+        isTarget: (node) => node === 'E',
+        getWeight: (node) => costs[node] ?? Infinity,
+      })
+      expect(target).toBe('E')
+      const path = unfoldPathfindingResult({ target, parents })
+      expect(path).toEqual(['A', 'B', 'E'])
+    })()
+  })
+
+  it('finds no path if target unreachable', () => {
+    const { target } = dijkstra({
+      start: 'C',
+      getNeighbors,
+      isTarget: (node) => node === 'Z', // nonexistent
+      getWeight: (node) => costs[node] ?? Infinity,
+    })
+    expect(target).toBeUndefined()
   })
 })
 

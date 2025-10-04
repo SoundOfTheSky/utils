@@ -160,6 +160,55 @@ export function dfs<T>(options: {
   }
 }
 
+/**
+ * Dijkstra search. Like bfs but supports weight.
+ * If isTarget is omitted becomes floodfill (WITH WEIGHT).
+ * Returns a target and map of parents.
+ * You can use `unfoldPathfindingResult()` to get array of nodes.
+ */
+export function dijkstra<T>(options: {
+  /** Start node */
+  start: T
+  /** Get weight of node */
+  getWeight: (node: T) => number
+  /** Get neighbors of node */
+  getNeighbors: (node: T) => T[]
+  /** Check if node is a target */
+  isTarget?: (node: T) => boolean
+}): {
+  parents: Map<T, T>
+  target?: T
+  distance: Map<T, number>
+} {
+  const parents = new Map<T, T>()
+  const distance = new Map<T, number>()
+  const visited = new Set<T>()
+  const queue: [number, T][] = [[0, options.start]]
+  distance.set(options.start, 0)
+  while (queue.length > 0) {
+    const [distribution, node] = queue.shift()!
+    if (visited.has(node)) continue
+    visited.add(node)
+    if (options.isTarget?.(node)) return { parents, target: node, distance }
+    const neighbors = options.getNeighbors(node)
+    for (let index = 0; index < neighbors.length; index++) {
+      const neighbor = neighbors[index]!
+      const cost = options.getWeight(neighbor)
+      const newDistribution = distribution + cost
+      if (newDistribution < (distance.get(neighbor) ?? Infinity)) {
+        distance.set(neighbor, newDistribution)
+        parents.set(neighbor, node)
+        pushToSorted<[number, T]>(
+          queue,
+          [newDistribution, neighbor],
+          ([x]) => x - newDistribution,
+        )
+      }
+    }
+  }
+  return { parents, distance }
+}
+
 /** Knapsack find best way to get maximum value in limited capacity */
 export function knapsack(
   weights: number[],
