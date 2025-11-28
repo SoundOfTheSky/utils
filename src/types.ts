@@ -19,12 +19,11 @@ export type AnyFunction = (...data: any[]) => any
 export type Falsy = false | '' | 0 | null | undefined
 
 /** Make keys in object optional */
-export type Optional<T, K extends keyof T> = Omit<T, K & keyof T> &
-  Partial<Pick<T, K & keyof T>>
+export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
 /** Make keys in object required */
-export type RequiredKey<T, K extends keyof T> = Omit<T, K & keyof T> &
-  Required<Pick<T, K & keyof T>>
+export type RequiredKey<T, K extends keyof T> = Omit<T, K> &
+  Required<Pick<T, K>>
 
 /** Get contructor type of an instance */
 export type Constructor<T> = new (..._arguments: any[]) => T
@@ -104,3 +103,17 @@ export type Concat<T, U> = T extends any[]
 export type Prettify<T extends object> = {
   [k in keyof T]: T[k]
 } & {}
+
+/**
+ * Create a tuple of size.
+ *
+ * ```ts
+ * type a = Tuple<number, 3>
+ * type b = [number, number, number]
+ * ```
+ */
+export type Tuple<
+  T,
+  N extends number,
+  R extends readonly T[] = [],
+> = R['length'] extends N ? R : Tuple<T, N, [...R, T]>

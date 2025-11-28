@@ -622,3 +622,11 @@ b: "b";
 ```
 
 ---
+__type__ `Tuple` - Create a tuple of size.
+
+```ts
+type a = Tuple<number, 3>
+type b = [number, number, number]
+```
+
+---
