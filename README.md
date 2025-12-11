@@ -440,7 +440,7 @@ Effects are simplest way to react to signal changes.
 Returned data from handler function will be passed to it on next signal change.
 Returns a function that will clear the effect.
 
-
+```ts
 // Will print signal on change
 effect(()=>{
 console.log($mySignal())
@@ -451,6 +451,7 @@ const mySignal = $mySignal()
 if(last>mySignal) console.log('Increment!')
 return mySignal;
 })
+```
 
 ---
 __function__ `untrack` - __SIGNALS SYSTEM__
@@ -466,7 +467,7 @@ console.log(untrack($a)+$b())
 ```
 
 ---
-__function__ `derived` - __SIGNALS SYSTEM__
+__function__ `computed` - __SIGNALS SYSTEM__
 
 Creates a derived reactive memoized signal.
 
@@ -507,6 +508,52 @@ await when(() => $a()>5)
 const promise = when(() => $a() > 5)
 const timeout = setTimeout(() => promise.reject('Timeout')}, 5000)
 primise.then(() => clearTimeout(timeout))
+```
+
+---
+__function__ `resource` - __SIGNALS SYSTEM__
+
+Creates a async resource with outputs:
+1. value$ - return value of function
+2. isLoading$ - whether promise is still running
+3. error$ - error that happened during. Set on error, cleared on refresh
+4. refresh - force rerun handler
+
+MAKE SURE THAT ALL SIGNAL'S VALUES ARE GRABBED BEFORE NEXT TICK!!!
+
+```ts
+const userId$ = signal(1);
+
+// WRONG
+const userResource = resource(async () => {
+const res = await fetch(`/api/user`)
+const userId = userId$();  // ERROR: Will not subscribe because after Promise i.e. next tick
+return res.json().find(x=>x.id===userId);
+})
+
+// Correct
+const userResource = resource(async () => {
+const userId = userId$(); // Correctly subscribed because ran on the same tick
+const res = await fetch(`/api/user`)
+return res.json().find(x=>x.id===userId);
+})
+
+// React to changes
+effect(() => {
+if (userResource.isLoading$()) {
+console.log('loading user...')
+} else if (userResource.error$()) {
+console.error('failed to load user', userResource.error$())
+} else {
+console.log('user loaded', userResource.value$())
+}
+})
+
+// Force a refresh
+userResource.refresh()
+
+// Stop automatic updates and cleanup
+userResource.clear()
 ```
 
 ---

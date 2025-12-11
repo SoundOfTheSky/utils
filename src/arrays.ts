@@ -110,9 +110,8 @@ export function permutations<T>(array: T[]): T[][] {
  * If compare returns > 0 it means target is smaller.
  * If compare returns < 0 it means target is bigger.
  *
- * ```ts
+ * @example
  * pushToSorted(numArray, 10,  x => x - 10);
- * ```
  */
 export function pushToSorted<T>(
   array: T[],

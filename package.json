@@ -1,6 +1,6 @@
 {
   "name": "@softsky/utils",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "description": "JavaScript/TypeScript utilities",
   "main": "dist/index.js",
   "scripts": {

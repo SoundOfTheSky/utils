@@ -294,7 +294,7 @@ export class SimpleEventSource<EVENTS extends Record<string, unknown>> {
 /**
  * Semaphore is used to limit concurrent tasks by delaying promise.
  *
- * ```ts
+ * @example
  * const semaphore = new Semaphore(2);
  *
  * async function task() {
@@ -317,7 +317,6 @@ export class SimpleEventSource<EVENTS extends Record<string, unknown>> {
  *    // Your code
  * })
  * // ...
- * ```
  */
 export class Semaphore {
   /** Tasks running. */

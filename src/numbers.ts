@@ -72,11 +72,10 @@ export function mean(array: number[]) {
 /**
  * Round with precision.
  *
- * ```ts
+ * @example
  * round(1.2345); // 1
  * round(1.2345, 2); // 1.23
  * round(1.2345, 10); // 1.2345
- * ```
  */
 export function round(value: number, precision = 0) {
   const mult = 10 ** precision

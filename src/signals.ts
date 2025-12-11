@@ -18,7 +18,7 @@ export type Signal<T> = (setTo?: T | ((previous: T) => T)) => T
  * when this data has changed any effects containing
  * this signal will be rerun.
  *
- * ```ts
+ * @example
  * const $mySignal = signal<number|undefined>(1) // Create signal with initial value 1
  * $mySignal(5) // Set to 5
  * $mySignal(undefined) // Set to undefined
@@ -27,7 +27,6 @@ export type Signal<T> = (setTo?: T | ((previous: T) => T)) => T
  * effect(()=>{
  *   console.log($mySignal())
  * })
- * ```
  */
 export function signal<T>(): Signal<T | undefined>
 export function signal<T>(value: T): Signal<T>
@@ -71,7 +70,7 @@ function clearEffect(handler: AnyFunction) {
  * Returned data from handler function will be passed to it on next signal change.
  * Returns a function that will clear the effect.
  *
- *
+ * @example
  * // Will print signal on change
  * effect(()=>{
  *   console.log($mySignal())
@@ -103,14 +102,13 @@ export function effect<T>(
  * __SIGNALS SYSTEM__
  *
  * Untrack helps to not react to changes in effects.
- * ```ts
+ * @example
  * const $a = signal(1)
  * const $b = signal(2)
  * // Will only run on changes to $b
  * effect(()=>{
  *   console.log(untrack($a)+$b())
  * })
- * ```
  */
 export function untrack<T>(handler: () => T): T {
   const lastEffect = currentEffect
@@ -125,23 +123,22 @@ export function untrack<T>(handler: () => T): T {
  *
  * Creates a derived reactive memoized signal.
  *
- * ```ts
+ * @example
  * // Sum of all changes of $a()
  * const { signal: $sumOfTwo, clear: clearSum } = derived((value) => value + $a(), 0)
- * ```
  */
-export function derived<T>(handler: (argument: T | undefined) => T): {
+export function computed<T>(handler: (argument: T | undefined) => T): {
   signal: Signal<T>
   clear: () => void
 }
-export function derived<T>(
+export function computed<T>(
   handler: (argument: T) => T,
   initialValue: T,
 ): {
   signal: Signal<T>
   clear: () => void
 }
-export function derived<T>(
+export function computed<T>(
   handler: (argument: T | undefined) => T,
   initialValue?: T,
 ): {
@@ -166,7 +163,7 @@ export function derived<T>(
  *
  * Batches multiple edits, so they don't call same effects multiple times
  *
- * ```ts
+ * @example
  * const $a = signal(1)
  * const $b = signal(2)
  * effect(()=>{
@@ -179,7 +176,6 @@ export function derived<T>(
  *  $a(5);
  *  $b(5);
  * })
- * ```
  */
 export function batch(handler: AnyFunction) {
   batchedEffects = new Set()
@@ -194,13 +190,12 @@ export function batch(handler: AnyFunction) {
  * Returns ImmediatePromise that is resolved when check function returns truthy value.
  * If you want to, you can resolve or reject promise beforehand.
  *
- * ```ts
+ * @example
  * await when(() => $a()>5)
  * // With timeout
  * const promise = when(() => $a() > 5)
  * const timeout = setTimeout(() => promise.reject('Timeout')}, 5000)
  * primise.then(() => clearTimeout(timeout))
- * ```
  */
 export function when(check: () => unknown) {
   const promise = new ImmediatePromise<undefined>()
@@ -211,4 +206,103 @@ export function when(check: () => unknown) {
     clear()
   })
   return promise
+}
+
+export type ResourceReturnType<T> = {
+  value$: Signal<T>
+  isLoading$: Signal<boolean>
+  error$: Signal<unknown>
+  refresh: () => Promise<T | undefined>
+  clear: () => void
+}
+/**
+ * __SIGNALS SYSTEM__
+ *
+ * Creates a async resource with outputs:
+ * 1. value$ - return value of function
+ * 2. isLoading$ - whether promise is still running
+ * 3. error$ - error that happened during. Set on error, cleared on refresh
+ * 4. refresh - force rerun handler
+ *
+ * MAKE SURE THAT ALL SIGNAL'S VALUES ARE GRABBED BEFORE NEXT TICK!!!
+ *
+ * @example
+ * const userId$ = signal(1);
+ *
+ * // WRONG
+ * const userResource = resource(async () => {
+ *   const res = await fetch(`/api/user`)
+ *   const userId = userId$();  // ERROR: Will not subscribe because after Promise i.e. next tick
+ *   return res.json().find(x=>x.id===userId);
+ * })
+ *
+ * // Correct
+ * const userResource = resource(async () => {
+ *   const userId = userId$(); // Correctly subscribed because ran on the same tick
+ *   const res = await fetch(`/api/user`)
+ *   return res.json().find(x=>x.id===userId);
+ * })
+ *
+ * // React to changes
+ * effect(() => {
+ *   if (userResource.isLoading$()) {
+ *     console.log('loading user...')
+ *   } else if (userResource.error$()) {
+ *     console.error('failed to load user', userResource.error$())
+ *   } else {
+ *     console.log('user loaded', userResource.value$())
+ *   }
+ * })
+ *
+ * // Force a refresh
+ * userResource.refresh()
+ *
+ * // Stop automatic updates and cleanup
+ * userResource.clear()
+ */
+export function resource<T>(
+  handler: (argument: T | undefined) => Promise<T>,
+): ResourceReturnType<T | undefined>
+export function resource<T>(
+  handler: (argument: T) => Promise<T>,
+  initialValue: T,
+): ResourceReturnType<T>
+export function resource<T>(
+  handler: (argument: T | undefined) => Promise<T>,
+  initialValue?: T,
+): ResourceReturnType<T | undefined> {
+  const value$ = signal(initialValue)
+  const isLoading$ = signal(false)
+  const error$ = signal()
+  const wrappedHandler = async () => {
+    batch(() => {
+      isLoading$(true)
+      error$(undefined)
+    })
+    let value: T
+    let error: unknown
+    try {
+      value = await handler(untrack(value$))
+    } catch (newError) {
+      error = newError
+    }
+    batch(() => {
+      if (error) error$(error)
+      else value$(value)
+      isLoading$(false)
+    })
+    return value!
+  }
+  currentEffect = wrappedHandler
+  void wrappedHandler()
+  currentEffect = undefined
+  return {
+    value$,
+    isLoading$,
+    error$,
+    refresh: wrappedHandler,
+    clear: () => {
+      clearEffect(wrappedHandler)
+    },
+  }
 }

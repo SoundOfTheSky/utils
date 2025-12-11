@@ -134,14 +134,13 @@ export function capitalizeFirstLetter(value: string) {
 /**
  * pipe() can be called on one or more functions, each of which can take the return of previous value.
  *
- * ```ts
+ * @example
  * // Takes string, converts to int, calc sqrt, convert and return date
  * pipe(
  *  (x: string) => Number.parseInt(x),
  *  (x) => Math.sqrt(x),
  *  (x) => new Date(x)
  * )('69')
- * ```
  */
 export function pipe(): <T>(x: T) => T
 export function pipe<T, A>(function1: (x: T) => A): (x: T) => A

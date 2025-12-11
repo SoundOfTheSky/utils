@@ -2,7 +2,15 @@
 import { describe, expect, it, mock } from 'bun:test'
 
 import { noop } from '../control'
-import { batch, derived, effect, signal, untrack, when } from '../signals'
+import {
+  batch,
+  computed,
+  effect,
+  signal,
+  untrack,
+  when,
+  resource,
+} from '../signals'
 
 describe('signal', () => {
   it('should get and set primitive values', () => {
@@ -81,10 +89,10 @@ describe('untrack', () => {
   })
 })
 
-describe('derived', () => {
+describe('computed', () => {
   it('should update when dependency changes', () => {
     const $a = signal(2)
-    const { signal: $double } = derived(() => $a() * 2)
+    const { signal: $double } = computed(() => $a() * 2)
     expect($double()).toBe(4)
     $a(3)
     expect($double()).toBe(6)
@@ -92,7 +100,7 @@ describe('derived', () => {
 
   it('should accumulate derived value over time', () => {
     const $a = signal(1)
-    const { signal: $sum } = derived((previous) => previous + $a(), 0)
+    const { signal: $sum } = computed((previous) => previous + $a(), 0)
     expect($sum()).toBe(1)
     $a(2)
     expect($sum()).toBe(3)
@@ -103,7 +111,7 @@ describe('derived', () => {
   it('should stop updating after calling clear', () => {
     const $a = signal(1)
     const $b = signal(2)
-    const { signal: $sum, clear } = derived(() => $a() + $b())
+    const { signal: $sum, clear } = computed(() => $a() + $b())
 
     expect($sum()).toBe(3)
     $a(10)
@@ -119,7 +127,7 @@ describe('derived', () => {
     const $a = signal(1)
     const $flag = signal(true)
     const spy = mock((previous: number) => previous + $a())
-    const { signal: $count } = derived(spy, 0)
+    const { signal: $count } = computed(spy, 0)
     expect($count()).toBe(1)
     $flag(false) // unrelated signal update
     expect($count()).toBe(1) // still 1
@@ -215,5 +223,123 @@ describe('when', () => {
     $value(15)
     await p
     expect(resolved).toBe(true)
+  })
+})
+
+describe('resource', () => {
+  it('should have correct state in each point in time', async () => {
+    const res = resource(async () => {
+      await new Promise((r) => setTimeout(r, 10))
+      return 'loaded'
+    })
+    expect(res.isLoading$()).toBe(true)
+    expect(res.value$()).toBeUndefined()
+    expect(res.error$()).toBeUndefined()
+    await new Promise((r) => setTimeout(r, 20))
+    expect(res.value$()).toBe('loaded')
+    expect(res.isLoading$()).toBe(false)
+    expect(res.error$()).toBeUndefined()
+  })
+
+  it('should handle errors', async () => {
+    const testError = new Error('fetch failed')
+    const res = resource(async () => {
+      await new Promise((r) => setTimeout(r, 10))
+      throw testError
+      return 'loaded'
+    })
+    expect(res.isLoading$()).toBe(true)
+    expect(res.value$()).toBeUndefined()
+    expect(res.error$()).toBeUndefined()
+    await new Promise((r) => setTimeout(r, 20))
+    expect(res.value$()).toBeUndefined()
+    expect(res.isLoading$()).toBe(false)
+    expect(res.error$()).toBe(testError)
+  })
+
+  it('should accept initial value', async () => {
+    const res = resource(async () => {
+      await new Promise((r) => setTimeout(r, 10))
+      return 'new value'
+    }, 'initial value')
+    expect(res.value$()).toBe('initial value')
+    expect(res.isLoading$()).toBe(true)
+    await new Promise((r) => setTimeout(r, 20))
+    expect(res.value$()).toBe('new value')
+  })
+
+  it('should refresh', async () => {
+    let shouldFail = true
+    const res = resource(async () => {
+      await new Promise((r) => setTimeout(r, 10))
+      if (shouldFail) throw new Error('failed')
+      return 'success'
+    })
+    await new Promise((r) => setTimeout(r, 20))
+    expect(res.error$()).toBeTruthy()
+    shouldFail = false
+    expect(res.isLoading$()).toBe(false)
+    const refresh = res.refresh()
+    expect(res.error$()).toBeUndefined()
+    expect(res.isLoading$()).toBe(true)
+    await refresh
+    expect(res.isLoading$()).toBe(false)
+    expect(res.error$()).toBeUndefined()
+    expect(res.value$()).toBe('success')
+  })
+
+  it('should react to signal changes and clear() to stop reacting', async () => {
+    const index = signal('1')
+    const res = resource(async () => {
+      const index$ = index()
+      await new Promise((r) => setTimeout(r, 10))
+      return index$
+    })
+    const states: string[] = []
+    effect(() => {
+      if (res.isLoading$()) states.push('loading')
+      else if (res.error$()) states.push('error')
+      else if (res.value$()) states.push(res.value$()!)
+    })
+    expect(states).toEqual(['loading'])
+    await new Promise((r) => setTimeout(r, 20))
+    expect(states).toEqual(['loading', '1'])
+    index('2')
+    expect(states).toEqual(['loading', '1', 'loading'])
+    await new Promise((r) => setTimeout(r, 20))
+    expect(states).toEqual(['loading', '1', 'loading', '2'])
+    res.clear()
+    index('3')
+    await new Promise((r) => setTimeout(r, 20))
+    expect(states).toEqual(['loading', '1', 'loading', '2'])
+  })
+
+  it('should pass previous value to handler', async () => {
+    const values: (number | undefined)[] = []
+    const res = resource(async (prev) => {
+      values.push(prev)
+      await new Promise((r) => setTimeout(r, 10))
+      return (prev || 0) + 1
+    }, 5)
+    await new Promise((r) => setTimeout(r, 20))
+    expect(values[0]).toBe(5)
+    await res.refresh()
+    expect(values[1]).toBe(6)
+  })
+
+  it('should work with untrack to avoid re-running', async () => {
+    const $triggerCount = signal(0)
+    let handlerCalls = 0
+    resource(async () => {
+      untrack(() => $triggerCount())
+      handlerCalls++
+      await new Promise((r) => setTimeout(r, 10))
+      return 'data'
+    })
+    await new Promise((r) => setTimeout(r, 20))
+    expect(handlerCalls).toBe(1)
+    $triggerCount(1)
+    await new Promise((r) => setTimeout(r, 10))
+    expect(handlerCalls).toBe(1) // Should not re-run due to untrack
   })
 })

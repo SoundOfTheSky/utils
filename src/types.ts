@@ -86,7 +86,7 @@ export type Concat<T, U> = T extends any[]
 /**
  * Visual only overhaul. Shows final type result on hover.
  *
- * ```ts
+ * @example
  * type a = {a: '1'}
  * type b = Prettify<a & { b: 'b' }>
  * // On hovering b it will show
@@ -98,7 +98,6 @@ export type Concat<T, U> = T extends any[]
  * type b = a & {
  *   b: "b";
  * }
- * ```
  * */
 export type Prettify<T extends object> = {
   [k in keyof T]: T[k]
@@ -107,10 +106,9 @@ export type Prettify<T extends object> = {
 /**
  * Create a tuple of size.
  *
- * ```ts
+ * @example
  * type a = Tuple<number, 3>
  * type b = [number, number, number]
- * ```
  */
 export type Tuple<
   T,

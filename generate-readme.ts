@@ -63,7 +63,7 @@ function extractCommentText(text: string) {
     .map((x) => (x.startsWith('*') ? x.slice(1) : x))
     .map((x) => x.trim())
     .join('\n')
-    .trim();
+    .trim().replace(/@example\n([\s\S]*?)(?=\n@|\n*$)/g, (match, codeBlock) => `\`\`\`ts\n${codeBlock.trim()}\n\`\`\``);
 }
 for (const file of files) {
   const content = readFileSync(`./src${file}.ts`, 'utf8');
