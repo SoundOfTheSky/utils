@@ -98,7 +98,7 @@ describe('computed', () => {
     expect($double()).toBe(6)
   })
 
-  it('should accumulate derived value over time', () => {
+  it('should accumulate computed value over time', () => {
     const $a = signal(1)
     const { signal: $sum } = computed((previous) => previous + $a(), 0)
     expect($sum()).toBe(1)

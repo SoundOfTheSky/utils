@@ -121,11 +121,11 @@ export function untrack<T>(handler: () => T): T {
 /**
  * __SIGNALS SYSTEM__
  *
- * Creates a derived reactive memoized signal.
+ * Creates a computed reactive memoized signal.
  *
  * @example
  * // Sum of all changes of $a()
- * const { signal: $sumOfTwo, clear: clearSum } = derived((value) => value + $a(), 0)
+ * const { signal: $sumOfTwo, clear: clearSum } = computed((value) => value + $a(), 0)
  */
 export function computed<T>(handler: (argument: T | undefined) => T): {
   signal: Signal<T>

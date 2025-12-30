@@ -469,11 +469,11 @@ console.log(untrack($a)+$b())
 ---
 __function__ `computed` - __SIGNALS SYSTEM__
 
-Creates a derived reactive memoized signal.
+Creates a computed reactive memoized signal.
 
 ```ts
 // Sum of all changes of $a()
-const { signal: $sumOfTwo, clear: clearSum } = derived((value) => value + $a(), 0)
+const { signal: $sumOfTwo, clear: clearSum } = computed((value) => value + $a(), 0)
 ```
 
 ---
@@ -674,6 +674,37 @@ __type__ `Tuple` - Create a tuple of size.
 ```ts
 type a = Tuple<number, 3>
 type b = [number, number, number]
+```
+
+---
+__type__ `UnionToIntersection` - Convert union type to intersection type
+
+```ts
+type a = UnionToIntersection<{a:1} | {b:2}>
+// Result:
+type a = {
+a: 1;
+} & {
+b: 2;
+}
+```
+
+---
+__type__ `LastOfUnion` - Get last type in union
+
+```ts
+type a = LastOfUnion<'a' | 'b' | 'c'>
+// Result:
+type a = "c"
+```
+
+---
+__type__ `LastValueInObject` - Get last value in object
+
+```ts
+type a = LastValueInObject<{a:1, b:2, c:3}>
+// Result:
+type a = 3
 ```
 
 ---

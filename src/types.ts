@@ -115,3 +115,51 @@ export type Tuple<
   N extends number,
   R extends readonly T[] = [],
 > = R['length'] extends N ? R : Tuple<T, N, [...R, T]>
+
+/**
+ * Convert union type to intersection type
+ *
+ * @example
+ * type a = UnionToIntersection<{a:1} | {b:2}>
+ * // Result:
+ * type a = {
+ *   a: 1;
+ * } & {
+ *   b: 2;
+ * }
+ */
+export type UnionToIntersection<U> = (
+  U extends any ? (x: U) => void : never
+) extends (x: infer I) => void
+  ? I
+  : never
+
+/**
+ * Get last type in union
+ *
+ * @example
+ * type a = LastOfUnion<'a' | 'b' | 'c'>
+ * // Result:
+ * type a = "c"
+ */
+export type LastOfUnion<U> =
+  UnionToIntersection<U extends any ? (x: U) => void : never> extends (
+    x: infer L,
+  ) => void
+    ? L
+    : never
+
+/**
+ * Get last value in object
+ *
+ * @example
+ * type a = LastValueInObject<{a:1, b:2, c:3}>
+ * // Result:
+ * type a = 3
+ */
+export type LastValueInObject<S extends object> = S[LastOfUnion<keyof S> &
+  keyof S]
+
+export type DeepPartial<T extends object> = {
+  [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K]
+}
