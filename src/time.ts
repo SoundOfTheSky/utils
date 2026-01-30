@@ -103,47 +103,51 @@ export function getNextCron(cronString: string, datetime = new Date()) {
     cron.unshift(index === 3 || index === 4 ? '1' : '0')
   const dt = new Date(datetime.getTime() + 1)
   const items = [
-    // Weekdays
+    // Weekdays (use UTC)
     [
       parseCronItem(cron[6]!, 0, 6),
-      dt.getDay.bind(dt),
+      dt.getUTCDay.bind(dt),
       (x: number) =>
-        dt.setDate(
-          dt.getDate() +
-            (dt.getDay() < x ? x - dt.getDay() : 7 - dt.getDay() + x),
+        dt.setUTCDate(
+          dt.getUTCDate() +
+            (dt.getUTCDay() < x ? x - dt.getUTCDay() : 7 - dt.getUTCDay() + x),
         ),
     ],
-    // Months
+    // Months (use UTC)
     [
       parseCronItem(cron[5]!, 1, 12),
-      () => dt.getMonth() + 1,
-      (x: number) => dt.setMonth(x - 1),
+      () => dt.getUTCMonth() + 1,
+      (x: number) => dt.setUTCMonth(x - 1),
     ],
-    // Dates
-    [parseCronItem(cron[4]!, 1, 31), dt.getDate.bind(dt), dt.setDate.bind(dt)],
-    // Hours
+    // Dates (use UTC)
+    [
+      parseCronItem(cron[4]!, 1, 31),
+      dt.getUTCDate.bind(dt),
+      dt.setUTCDate.bind(dt),
+    ],
+    // Hours (use UTC)
     [
       parseCronItem(cron[3]!, 0, 23),
-      dt.getHours.bind(dt),
-      dt.setHours.bind(dt),
+      dt.getUTCHours.bind(dt),
+      dt.setUTCHours.bind(dt),
     ],
-    // Minutes
+    // Minutes (use UTC)
     [
       parseCronItem(cron[2]!, 0, 59),
-      dt.getMinutes.bind(dt),
-      dt.setMinutes.bind(dt),
+      dt.getUTCMinutes.bind(dt),
+      dt.setUTCMinutes.bind(dt),
     ],
-    // Seconds
+    // Seconds (use UTC)
     [
       parseCronItem(cron[1]!, 0, 59),
-      dt.getSeconds.bind(dt),
-      dt.setSeconds.bind(dt),
+      dt.getUTCSeconds.bind(dt),
+      dt.setUTCSeconds.bind(dt),
     ],
-    // Milliseconds
+    // Milliseconds (use UTC)
     [
       parseCronItem(cron[0]!, 0, 999),
-      dt.getMilliseconds.bind(dt),
-      dt.setMilliseconds.bind(dt),
+      dt.getUTCMilliseconds.bind(dt),
+      dt.setUTCMilliseconds.bind(dt),
     ],
   ] as const
   for (let index = 0; index < items.length; index++) {
@@ -166,7 +170,7 @@ export function getNextCron(cronString: string, datetime = new Date()) {
     else {
       // Set lowest value, increase item before and recheck everything
       setN(ok[0]!)
-      if (index === 1) dt.setFullYear(dt.getFullYear() + 1)
+      if (index === 1) dt.setUTCFullYear(dt.getUTCFullYear() + 1)
       else if (index > 1) {
         const [, getN, setN] = items[index - 1]!
         setN(getN() + 1)
@@ -259,8 +263,7 @@ export class SpeedCalculator<SIZE extends number | undefined> {
           : {
               speed,
               percent: this.sum / this.size,
-
-              eta: ~~((this.size - this.sum) / speed) * 1000,
+              eta: Math.floor((this.size - this.sum) / speed) * 1000,
             }
     }
     return this.statsCached as SIZE extends number
